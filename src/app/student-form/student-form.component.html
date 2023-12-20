@@ -1,0 +1,42 @@
+<div>
+  <h2>Student Entry Form</h2>
+  <form (ngSubmit)="submitForm()">
+    <label for="firstName">First Name:</label>
+    <input
+      type="text"
+      id="firstName"
+      [(ngModel)]="student.firstName"
+      name="firstName"
+      required
+    />
+
+    <label for="lastName">Last Name:</label>
+    <input
+      type="text"
+      id="lastName"
+      [(ngModel)]="student.lastName"
+      name="lastName"
+      required
+    />
+
+    <label for="age">Age:</label>
+    <input
+      type="number"
+      id="age"
+      [(ngModel)]="student.age"
+      name="age"
+      required
+    />
+
+    <label for="grade">Grade:</label>
+    <input
+      type="text"
+      id="grade"
+      [(ngModel)]="student.grade"
+      name="grade"
+      required
+    />
+
+    <button type="submit">Submit</button>
+  </form>
+</div>
