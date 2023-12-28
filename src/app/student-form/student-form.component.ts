@@ -8,8 +8,10 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./student-form.component.css'],
 })
 export class StudentFormComponent implements OnInit {
-  constructor(private http: HttpClient, private service: ApiService) {}
+  data: any;
 
+  constructor(private http: HttpClient, private service: ApiService) {}
+  results: any = [];
   students = {
     id: 0,
     name: '',
@@ -19,13 +21,24 @@ export class StudentFormComponent implements OnInit {
     nrc_exists: true,
     nrc: '',
   };
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getstudent();
+  }
+  // radio button
+  gendermale() {
+    this.students.gender = false;
+  }
+  genderfemale() {
+    this.students.gender = true;
+  }
+
+  // Add
   async savestudent() {
     console.log(this.students);
     await this.service.studentsApiData(this.students).subscribe({
       next: (result: any) => {
         console.log('STUDENTS ADD SUCCESSFULLY!', result);
-        this.students = result.data;
+        this.getstudent();
       },
       error: (error: any) => {
         console.log('FAIL', error);
@@ -33,23 +46,60 @@ export class StudentFormComponent implements OnInit {
     });
   }
 
-  // name = new FormControl(''); //Build Object
-  // password = new FormControl('');
+  // FindAll
+  async getstudent() {
+    console.log('>>>>>>ERROR>>>>');
+    await this.service.getstudents().subscribe({
+      next: (result: any) => {
+        console.log('ADD SUCCESSFULLY!', result);
+        this.results = result.data;
+      },
+      error: (error: any) => {
+        console.log('FAIL', error);
+      },
+    });
+  }
 
-  // genderradio = new FormControl('');
-  // selectedDate: any;
+  // Delete
+  async deletestudent(id: number) {
+    await this.service.destroystudents(id).subscribe({
+      next: (result: any) => {
+        console.log('Student Deleted!');
+        this.getstudent();
+      },
+      error: (error: any) => {
+        alert('FAIL!');
+      },
+    });
+  }
 
-  // genderradio = new FormControl('');
-  // genders = ['male', 'female', 'rathernottosay'];
+  // Update
+  async updatestudent(id: any) {
+    var updatedata = {
+      id: 0,
+      name: '',
+      father_name: '',
+      date_of_birth: '',
+      gender: true,
+      nrc_exists: true,
+      nrc: '',
+    };
+    await this.service.updatestudents(id, updatedata).subscribe({
+      next: (result: any) => {
+        console.log('Updated Successfully!');
+        this.getstudent();
+      },
+      error: (error: any) => {
+        alert('FAIL!');
+      },
+    });
+  }
+
   toggleNRCInput() {
     throw new Error('Method not implemented.');
   }
   onSubmit() {
-    // console.log(this.students.name);
-    // console.log(this.students.father_name);
     console.log(this.students);
-
-    // console.log(this.genderradio.value);
   }
   student: any;
   submitForm() {

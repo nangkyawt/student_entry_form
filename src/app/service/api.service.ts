@@ -9,4 +9,14 @@ export class ApiService {
   studentsApiData(data: any) {
     return this.http.post(`http://localhost:3000/api/v1/students`, data);
   }
+  getstudents() {
+    return this.http.get(`http://localhost:3000/api/v1/students`);
+  }
+  destroystudents(id: any) {
+    return this.http.delete(`http://localhost:3000/api/v1/students/${id}`);
+  }
+
+  updatestudents(id: any, data: any) {
+    return this.http.patch(`http://localhost:3000/api/v1/students/${id}`, data);
+  }
 }

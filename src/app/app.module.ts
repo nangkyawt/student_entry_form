@@ -5,9 +5,10 @@ import { AppComponent } from './app.component';
 import { StudentFormComponent } from './student-form/student-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { GenderPipe } from './gender.pipe';
 
 @NgModule({
-  declarations: [AppComponent, StudentFormComponent],
+  declarations: [AppComponent, StudentFormComponent, GenderPipe],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
