@@ -1,12 +1,18 @@
+<div *ngIf="showSuccessMessage" class="alert alert-success" role="alert">
+  Student add successfully!
+</div>
+
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Students Form</a>
+    <a class="navbar-brand" href="#">STUDENTS FORM</a>
     <nav class="navbar bg-body-tertiary">
       <form class="d-flex" role="search">
         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         <input
           class="form-control me-2"
           type="search"
+          name="search"
+          [(ngModel)]="searchText"
           placeholder="Search"
           aria-label="Search"
         />
@@ -58,56 +64,94 @@
       </div>
       <div class="modal-body">
         <div class="container-fluid">
-          <form>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">ID</label>
-              <input
-                type="number"
-                placeholder="Enter your Id"
-                class="form-control"
-                id="exampleInputEmail1"
-                name="id"
-                [(ngModel)]="students.id"
-                aria-describedby="emailHelp"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">Name</label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                class="form-control"
-                id="exampleInputEmail1"
-                name="name"
-                [(ngModel)]="students.name"
-                aria-describedby="emailHelp"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label"
-                >Father Name</label
-              >
-              <input
-                type="text"
-                placeholder="Enter name"
-                class="form-control"
-                id="exampleInputPassword1"
-                name="father_name"
-                [(ngModel)]="students.father_name"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="datepicker">Date of Birth:</label>
-              <input
-                class="form-control"
-                type="date"
-                id="datepicker"
-                name="datepicker"
-                [(ngModel)]="students.date_of_birth"
-              />
+          <form #studentForm="ngForm" (ngSubmit)="(studentForm.form.valid)">
+            <tr class="mb-3">
+              <td><label for="identify" class="form-label">ID</label></td>
+              <td>
+                <input
+                  type="number"
+                  placeholder="Enter your Id"
+                  class="form-control"
+                  id="id"
+                  name="id"
+                  #identify="ngModel"
+                  [(ngModel)]="students.id"
+                  required
+                  aria-describedby="emailHelp"
+                /><span class="span" *ngIf="identify.touched && identify.errors"
+                  >Please enter id</span
+                >
+              </td>
+            </tr>
+            <tr class="mb-3">
+              <td>
+                <label for="exampleInputEmail1" class="form-label">Name</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  #exampleInputEmail1="ngModel"
+                  name="name"
+                  [(ngModel)]="students.name"
+                  required
+                  aria-describedby="emailHelp"
+                />
+                <span
+                  class="span"
+                  *ngIf="
+                    exampleInputEmail1.touched && exampleInputEmail1.errors
+                  "
+                  >Please enter your name</span
+                >
+              </td>
+            </tr>
+            <tr class="mb-3">
+              <td>
+                <label for="exampleInputPassword1" class="form-label"
+                  >Father Name</label
+                >
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  class="form-control"
+                  id="exampleInputPassword1"
+                  #exampleInputPassword1="ngModel"
+                  name="father_name"
+                  [(ngModel)]="students.father_name"
+                  required
+                />
+                <span
+                  class="span"
+                  *ngIf="
+                    exampleInputPassword1.touched &&
+                    exampleInputPassword1.errors
+                  "
+                  >Please enter name</span
+                >
+              </td>
+            </tr>
+            <tr class="mb-3">
+              <td><label for="datepicker">Date of Birth:</label></td>
+              <td>
+                <input
+                  class="form-control"
+                  type="date"
+                  id="datepicker"
+                  name="datepicker"
+                  [(ngModel)]="students.date_of_birth"
+                  required
+                />
+              </td>
               <!-- <p>Selected Date: {{ selectedDate }}</p> -->
-            </div>
+              <div *ngIf="valiAge()" class="text-danger">
+                Student must be 18years and above.
+              </div>
+            </tr>
             <div class="mb-3">
               <div class="form-check form-check-inline">
                 <input
@@ -147,25 +191,35 @@
               />
             </div>
 
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">NRC</label>
-              <input
-                type="text"
-                placeholder="Enter your NRC"
-                class="form-control"
-                name="nrc"
-                id="exampleInputEmail1"
-                [(ngModel)]="students.nrc"
-                [disabled]="!students.nrc_exists"
-              />
-            </div>
+            <tr class="mb-3">
+              <td>
+                <label for="exampleInputEmail1" class="form-label">NRC</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Enter your NRC"
+                  class="form-control"
+                  name="nrc"
+                  id="exampleInputEmail1"
+                  [(ngModel)]="students.nrc"
+                  [disabled]="!students.nrc_exists"
+                />
+              </td>
+            </tr>
           </form>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs="modal"
+          (click)="new_data(studentForm)"
+        >
+          New
         </button>
+
         <button
           type="button"
           class="btn btn-primary"
@@ -174,6 +228,9 @@
         >
           Submit
         </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
       </div>
     </div>
   </div>
@@ -181,43 +238,62 @@
 <table class="table table-striped table-hover">
   <thead>
     <tr>
-      <th>Id</th>
-      <th>Name</th>
-      <th>Father Name</th>
-      <th>Date of Birth</th>
-      <th>Gender</th>
-      <th>Nrc</th>
-      <th>Action</th>
+      <th class="table1">Id</th>
+      <th class="table1">Name</th>
+      <th class="table1">Father Name</th>
+      <th class="table1">Date of Birth</th>
+      <th class="table1">Gender</th>
+      <th class="table1">Nrc Exists</th>
+      <th class="table1">Nrc</th>
+      <th class="table1">Action</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let result of results">
+    <tr
+      *ngFor="
+        let result of results
+          | search : searchText
+          | paginate : { itemsPerPage: pageSize, currentPage: currentPage }
+      "
+    >
       <td>{{ result.id }}</td>
       <td>{{ result.name }}</td>
       <td>{{ result.father_name }}</td>
       <td>{{ result.date_of_birth | date : "yyyy-MM-dd" : "UTC" }}</td>
       <td>{{ result.gender | gender }}</td>
+      <td>{{ result.nrc_exists }}</td>
       <td>{{ result.nrc }}</td>
-      <input
+      <button
         type="button"
         data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop"
-        value="Edit"
+        data-bs-target="#exampleModal1"
         class="btn btn success me-2"
-        (click)="updatestudent(result.id)"
-      />
-      <input
+        (click)="getarray(result)"
+      >
+        Edit
+      </button>
+
+      <button
         type="button"
         value="Delete"
         class="btn btn danger"
-        (click)="deletestudent(result.id)"
-      />
+        data-bs-target="#delete"
+        aria-hidden="true"
+        data-bs-toggle="modal"
+        (click)="getId(result.id)"
+      >
+        Delete
+      </button>
     </tr>
   </tbody>
 </table>
+<pagination-controls
+  class="d-flex justify-content-center"
+  (pageChange)="currentPage = $event"
+></pagination-controls>
 <div
   class="modal fade"
-  id="exampleModal"
+  id="exampleModal1"
   tabindex="-1"
   aria-labelledby="exampleModalLabel"
   aria-hidden="true"
@@ -226,7 +302,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">
-          Add Student Data
+          Edit Student Data
         </h1>
         <button
           type="button"
@@ -238,43 +314,68 @@
       <div class="modal-body">
         <div class="container-fluid">
           <form>
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">Name</label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                class="form-control"
-                id="exampleInputEmail1"
-                name="name"
-                [(ngModel)]="students.name"
-                aria-describedby="emailHelp"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label"
-                >Father Name</label
-              >
-              <input
-                type="text"
-                placeholder="Enter name"
-                class="form-control"
-                id="exampleInputPassword1"
-                name="father_name"
-                [(ngModel)]="students.father_name"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="datepicker">Date of Birth:</label>
-              <input
-                class="form-control"
-                type="date"
-                id="datepicker"
-                name="datepicker"
-                [(ngModel)]="students.date_of_birth"
-              />
-              <!-- <p>Selected Date: {{ selectedDate }}</p> -->
-            </div>
+            <tr class="mb-3">
+              <td><label for="identify" class="form-label">ID</label></td>
+              <td>
+                <input
+                  type="number"
+                  placeholder="Enter your Id"
+                  class="form-control"
+                  id="id"
+                  name="id"
+                  #identify="ngModel"
+                  [(ngModel)]="array.id"
+                  disabled
+                  aria-describedby="emailHelp"
+                />
+              </td>
+            </tr>
+            <tr class="mb-3">
+              <td>
+                <label for="exampleInputEmail1" class="form-label">Name</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  name="name"
+                  [(ngModel)]="array.name"
+                  aria-describedby="emailHelp"
+                />
+              </td>
+            </tr>
+            <tr class="mb-3">
+              <td>
+                <label for="exampleInputPassword1" class="form-label"
+                  >Father Name</label
+                >
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  class="form-control"
+                  id="exampleInputPassword1"
+                  name="father_name"
+                  [(ngModel)]="array.father_name"
+                  required
+                />
+              </td>
+            </tr>
+            <tr class="mb-3">
+              <td><label for="datepicker">Date of Birth:</label></td>
+              <td>
+                <input
+                  class="form-control"
+                  type="date"
+                  id="datepicker"
+                  name="datepicker"
+                  [(ngModel)]="array.date_of_birth"
+                />
+              </td>
+            </tr>
             <div class="mb-3">
               <div class="form-check form-check-inline">
                 <input
@@ -308,24 +409,60 @@
                 class="form-check-input"
                 name="nrc_exists"
                 id="exampleCheck1"
-                [(ngModel)]="students.nrc_exists"
+                [(ngModel)]="array.nrc_exists"
               />
             </div>
 
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">NRC</label>
-              <input
-                type="text"
-                placeholder="Enter your NRC"
-                class="form-control"
-                name="nrc"
-                id="exampleInputEmail1"
-                [(ngModel)]="students.nrc"
-                [disabled]="!students.nrc_exists"
-              />
-            </div>
+            <tr class="mb-3">
+              <td>
+                <label for="exampleInputEmail1" class="form-label">NRC</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  placeholder="Enter your NRC"
+                  class="form-control"
+                  name="nrc"
+                  id="exampleInputEmail1"
+                  [(ngModel)]="array.nrc"
+                  [disabled]="!array.nrc_exists"
+                />
+              </td>
+            </tr>
           </form>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-dismiss="modal"
+          (click)="updatestudent()"
+        >
+          Submit
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" tabindex="-1" id="delete">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          ata-bs-target="#exampleModal1"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure want to delete?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -333,11 +470,12 @@
         </button>
         <button
           type="button"
-          class="btn btn-primary"
+          value="delete"
+          class="btn btn danger"
           data-bs-dismiss="modal"
-          (click)="savestudent()"
+          (click)="deletestudent()"
         >
-          Submit
+          Delete
         </button>
       </div>
     </div>

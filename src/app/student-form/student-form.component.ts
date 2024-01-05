@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../service/api.service';
 import { HttpClient } from '@angular/common/http';
+import { throttle } from 'rxjs';
 
 @Component({
   selector: 'app-student-form',
@@ -11,19 +12,25 @@ export class StudentFormComponent implements OnInit {
   data: any;
 
   constructor(private http: HttpClient, private service: ApiService) {}
+  pageSize: any = 5;
+  currentPage = 1;
+  searchText: any;
   results: any = [];
+  array: any = [];
+  showSuccessMessage = false;
   students = {
     id: 0,
     name: '',
     father_name: '',
     date_of_birth: '',
     gender: true,
-    nrc_exists: true,
+    nrc_exists: false,
     nrc: '',
   };
   ngOnInit(): void {
     this.getstudent();
   }
+
   // radio button
   gendermale() {
     this.students.gender = false;
@@ -35,10 +42,26 @@ export class StudentFormComponent implements OnInit {
   // Add
   async savestudent() {
     console.log(this.students);
-    await this.service.studentsApiData(this.students).subscribe({
+    var saveData = {
+      id: this.students.id,
+      name: this.students.name,
+      father_name: this.students.father_name,
+      date_of_birth: this.students.date_of_birth,
+      gender: this.students.gender,
+      nrc_exists: this.students.nrc_exists,
+      nrc: this.students.nrc,
+    };
+    await this.service.studentsApiData(saveData).subscribe({
       next: (result: any) => {
-        console.log('STUDENTS ADD SUCCESSFULLY!', result);
-        this.getstudent();
+        console.log('Student add successfully!');
+
+        this.results.push(saveData);
+        // asscending order
+        this.results.sort((a: any, b: any) => a.id - b.id);
+        this.showSuccessMessage = true;
+        setTimeout(() => {
+          this.showSuccessMessage = false;
+        }, 3000);
       },
       error: (error: any) => {
         console.log('FAIL', error);
@@ -52,7 +75,10 @@ export class StudentFormComponent implements OnInit {
     await this.service.getstudents().subscribe({
       next: (result: any) => {
         console.log('ADD SUCCESSFULLY!', result);
+
         this.results = result.data;
+        // descending order
+        result.data.sort((a: any, b: any) => a.id - b.id);
       },
       error: (error: any) => {
         console.log('FAIL', error);
@@ -61,10 +87,10 @@ export class StudentFormComponent implements OnInit {
   }
 
   // Delete
-  async deletestudent(id: number) {
-    await this.service.destroystudents(id).subscribe({
+  async deletestudent() {
+    await this.service.destroystudents(this.students.id).subscribe({
       next: (result: any) => {
-        console.log('Student Deleted!');
+        console.log('Deleted Sussessfully!');
         this.getstudent();
       },
       error: (error: any) => {
@@ -74,19 +100,18 @@ export class StudentFormComponent implements OnInit {
   }
 
   // Update
-  async updatestudent(id: any) {
+  async updatestudent() {
     var updatedata = {
-      id: 0,
-      name: '',
-      father_name: '',
-      date_of_birth: '',
-      gender: true,
-      nrc_exists: true,
-      nrc: '',
+      name: this.array.name,
+      father_name: this.array.father_name,
+      date_of_birth: this.array.date_of_birth || Date.now(),
+      gender: this.array.gender,
+      nrc_exists: this.array.nrc_exists,
+      nrc: this.array.nrc || null,
     };
-    await this.service.updatestudents(id, updatedata).subscribe({
+    await this.service.updatestudents(this.array.id, updatedata).subscribe({
       next: (result: any) => {
-        console.log('Updated Successfully!');
+        console.log('Updated Successfully!', result);
         this.getstudent();
       },
       error: (error: any) => {
@@ -95,12 +120,37 @@ export class StudentFormComponent implements OnInit {
     });
   }
 
+  new_data(form: any) {
+    form.resetForm();
+  }
+
+  getId(id: any) {
+    return (this.students.id = id);
+  }
+
+  getarray(data: any) {
+    //data assign
+    this.array = data;
+  }
+  valiAge(): boolean {
+    if (!this.students.date_of_birth) {
+      return false;
+    }
+    const birthDate = new Date(this.students.date_of_birth);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+
+    return age < 18;
+  }
+
   toggleNRCInput() {
     throw new Error('Method not implemented.');
   }
+
   onSubmit() {
     console.log(this.students);
   }
+
   student: any;
   submitForm() {
     throw new Error('Method not implemented.');

@@ -6,10 +6,18 @@ import { StudentFormComponent } from './student-form/student-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { GenderPipe } from './gender.pipe';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { SearchPipe } from './search.pipe';
 
 @NgModule({
-  declarations: [AppComponent, StudentFormComponent, GenderPipe],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
+  declarations: [AppComponent, StudentFormComponent, GenderPipe, SearchPipe],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    NgxPaginationModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })
