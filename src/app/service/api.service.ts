@@ -19,4 +19,10 @@ export class ApiService {
   updatestudents(id: any, data: any) {
     return this.http.patch(`http://localhost:3000/api/v1/students/${id}`, data);
   }
+  bulkCreate(data: any) {
+    return this.http.post(
+      `http://localhost:3000/api/v1/students/bulkCreate`,
+      data
+    );
+  }
 }

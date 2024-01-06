@@ -57,3 +57,7 @@ input {
   background-color: #9870f5;
   color:azure
 }
+
+input[type="file"] {
+  margin-top: 10px;
+}

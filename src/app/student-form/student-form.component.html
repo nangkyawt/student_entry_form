@@ -25,6 +25,7 @@
         <!-- <li class="nav-item">
           <a class="nav-link" routerLink="/Search">Search</a>
         </li> -->
+
         <li class="nav-item">
           <button
             type="button"
@@ -35,7 +36,14 @@
             Add Student
           </button>
         </li>
-        <li></li>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs="modal"
+          (click)="exportToExcel(results, 'studentForm')"
+        >
+          Excel
+        </button>
       </ul>
     </div>
   </div>
@@ -161,6 +169,7 @@
                   id="inlineRadio1"
                   value="option1"
                   (change)="gendermale()"
+                  [(ngModel)]="students.gender"
                 />
                 <label class="form-check-label" for="inlineRadio1">Male</label>
               </div>
@@ -172,6 +181,7 @@
                   id="inlineRadio2"
                   value="option2"
                   (change)="genderfemale()"
+                  [(ngModel)]="students.gender"
                 />
                 <label class="form-check-label" for="inlineRadio2"
                   >Female</label
@@ -481,3 +491,4 @@
     </div>
   </div>
 </div>
+<input type="file" (change)="importFromExcel($event)" />

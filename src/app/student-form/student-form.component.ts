@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../service/api.service';
 import { HttpClient } from '@angular/common/http';
 import { throttle } from 'rxjs';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-student-form',
@@ -15,8 +16,11 @@ export class StudentFormComponent implements OnInit {
   pageSize: any = 5;
   currentPage = 1;
   searchText: any;
+
   results: any = [];
   array: any = [];
+  excel_data: any = [];
+  // import_data: any = [];
   showSuccessMessage = false;
   students = {
     id: 0,
@@ -132,6 +136,8 @@ export class StudentFormComponent implements OnInit {
     //data assign
     this.array = data;
   }
+
+  // Validation
   valiAge(): boolean {
     if (!this.students.date_of_birth) {
       return false;
@@ -141,6 +147,52 @@ export class StudentFormComponent implements OnInit {
     const age = today.getFullYear() - birthDate.getFullYear();
 
     return age < 18;
+  }
+
+  // Export Excel
+
+  exportToExcel(data: any, filenName: string): void {
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, `${filenName}.xlsx`);
+  }
+
+  // Import Excel
+  importFromExcel(event: any): void {
+    const file: File = event.target.files[0];
+    const reader: FileReader = new FileReader();
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const data = e.target.result;
+        const binaryString: string = e.target.result;
+        const workbook: XLSX.WorkBook = XLSX.read(binaryString, {
+          type: 'binary',
+        });
+        const sheetName: string = workbook.SheetNames[0];
+        const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
+        const importedData: any[] = XLSX.utils.sheet_to_json(worksheet, {
+          raw: true,
+        });
+        // Process the imported data as needed
+        console.log(importedData);
+        // const dataWithUniqueIds = importedData.map(record => {
+        //   return { ...record, Epl_id: uuidv4() };
+        // });
+        this.service.bulkCreate(importedData).subscribe({
+          next: (result: any) => {
+            console.log('Excel datas saved successfully', result);
+            this.getstudent();
+          },
+          error: (error: any) => {
+            console.log('Error Saving datas form Excel', error);
+          },
+        });
+        // Assuming you have a method in your service to handle bulk insertion
+      };
+      reader.readAsBinaryString(file);
+    }
   }
 
   toggleNRCInput() {
