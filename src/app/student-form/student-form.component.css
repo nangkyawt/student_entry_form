@@ -12,6 +12,7 @@
   color: #ffff;
 }
 .btn {
+  /* margin-left: 20%; */
   background-color: rgb(240, 19, 85);
   border: rgb(243, 236, 236);
   color: #ffff;
@@ -55,9 +56,40 @@ input {
 }
 .table1 {
   background-color: #9870f5;
-  color:azure
+  color: azure;
 }
 
 input[type="file"] {
   margin-top: 10px;
+}
+
+.navbar-nav button {
+  margin-right: 10px; /* Adjust the value as needed for the desired spacing */
+}
+.text {
+  text-align: end;
+}
+.form-container {
+  width: 100%;
+}
+
+.form-control {
+  width: 300px;
+}
+
+.idbox {
+  width: 65%;
+}
+
+.namebox {
+  width: 65%;
+}
+.farbox {
+  width: 65%;
+}
+.datebox {
+  width: 65%;
+}
+.nrcbox {
+  width: 65%;
 }

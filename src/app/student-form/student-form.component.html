@@ -1,6 +1,16 @@
 <div *ngIf="showSuccessMessage" class="alert alert-success" role="alert">
   Student add successfully!
 </div>
+<!-- s -->
+<div *ngIf="showGenderErrorMessage" class="alert alert-danger" role="alert">
+  Invalid gender in Excel data. Gender must be "male" or "female".
+</div>
+<div *ngIf="showNameErrorMessage" class="alert alert-danger" role="alert">
+  Invalid name.
+</div>
+<div *ngIf="showNRCExistsErrorMessage" class="alert alert-danger" role="alert">
+  Invalid NRC.
+</div>
 
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
@@ -22,10 +32,31 @@
 
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
-        <!-- <li class="nav-item">
-          <a class="nav-link" routerLink="/Search">Search</a>
-        </li> -->
+        <li>
+          <button
+            type="button"
+            class="export btn"
+            data-bs="modal"
+            (click)="openFileInput()"
+          >
+            <input
+              type="file"
+              (change)="importFromExcel($event)"
+              #fileInput
+              style="display: none"
+            />
+            Import
+          </button>
+        </li>
 
+        <button
+          type="button"
+          class="export btn"
+          data-bs="modal"
+          (click)="exportToExcel(results, 'studentForm')"
+        >
+          Export
+        </button>
         <li class="nav-item">
           <button
             type="button"
@@ -36,14 +67,6 @@
             Add Student
           </button>
         </li>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs="modal"
-          (click)="exportToExcel(results, 'studentForm')"
-        >
-          Excel
-        </button>
       </ul>
     </div>
   </div>
@@ -66,16 +89,19 @@
         <button
           type="button"
           class="btn-close"
-          data-bs-dismiss="modal"
           aria-label="Close"
+          data-bs-dismiss="modal"
         ></button>
       </div>
       <div class="modal-body">
         <div class="container-fluid">
-          <form #studentForm="ngForm" (ngSubmit)="(studentForm.form.valid)">
-            <tr class="mb-3">
-              <td><label for="identify" class="form-label">ID</label></td>
-              <td>
+          <form
+            #studentForm="ngForm"
+            (ngSubmit)="studentForm.form.valid && savestudent(studentForm)"
+          >
+            <div class="mb-3">
+              <td><label for="identify" class="form-label">ID:</label></td>
+              <td class="idbox">
                 <input
                   type="number"
                   placeholder="Enter your Id"
@@ -90,12 +116,12 @@
                   >Please enter id</span
                 >
               </td>
-            </tr>
-            <tr class="mb-3">
+            </div>
+            <div class="mb-3">
               <td>
-                <label for="exampleInputEmail1" class="form-label">Name</label>
+                <label for="exampleInputEmail1" class="form-label">Name:</label>
               </td>
-              <td>
+              <td class="namebox">
                 <input
                   type="text"
                   placeholder="Enter your name"
@@ -115,14 +141,14 @@
                   >Please enter your name</span
                 >
               </td>
-            </tr>
-            <tr class="mb-3">
+            </div>
+            <div class="mb-3">
               <td>
                 <label for="exampleInputPassword1" class="form-label"
-                  >Father Name</label
+                  >Father Name:</label
                 >
               </td>
-              <td>
+              <td class="farbox">
                 <input
                   type="text"
                   placeholder="Enter name"
@@ -142,10 +168,10 @@
                   >Please enter name</span
                 >
               </td>
-            </tr>
-            <tr class="mb-3">
+            </div>
+            <div class="mb-3">
               <td><label for="datepicker">Date of Birth:</label></td>
-              <td>
+              <td class="datebox">
                 <input
                   class="form-control"
                   type="date"
@@ -157,36 +183,41 @@
               </td>
               <!-- <p>Selected Date: {{ selectedDate }}</p> -->
               <div *ngIf="valiAge()" class="text-danger">
-                Student must be 18years and above.
+                Student must be 18years or above.
               </div>
-            </tr>
+            </div>
             <div class="mb-3">
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="inlineRadio1"
-                  value="option1"
-                  (change)="gendermale()"
-                  [(ngModel)]="students.gender"
-                />
-                <label class="form-check-label" for="inlineRadio1">Male</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="inlineRadio2"
-                  value="option2"
-                  (change)="genderfemale()"
-                  [(ngModel)]="students.gender"
-                />
-                <label class="form-check-label" for="inlineRadio2"
-                  >Female</label
-                >
-              </div>
+              <td>
+                <label for="gender">Gender:</label>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="inlineRadioOptions"
+                    id="inlineRadio1"
+                    value="option1"
+                    (change)="gendermale()"
+                    [(ngModel)]="students.gender"
+                  />
+                  <label class="form-check-label" for="inlineRadio1"
+                    >Male</label
+                  >
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="inlineRadioOptions"
+                    id="inlineRadio2"
+                    value="option2"
+                    (change)="genderfemale()"
+                    [(ngModel)]="students.gender"
+                  />
+                  <label class="form-check-label" for="inlineRadio2"
+                    >Female</label
+                  >
+                </div>
+              </td>
             </div>
             <div class="mb-3 form-check">
               <label class="form-check-label" for="exampleCheck1"
@@ -201,11 +232,11 @@
               />
             </div>
 
-            <tr class="mb-3">
+            <div class="mb-3">
               <td>
-                <label for="exampleInputEmail1" class="form-label">NRC</label>
+                <label for="exampleInputEmail1" class="form-label">NRC:</label>
               </td>
-              <td>
+              <td class="nrcbox">
                 <input
                   type="text"
                   placeholder="Enter your NRC"
@@ -216,7 +247,7 @@
                   [disabled]="!students.nrc_exists"
                 />
               </td>
-            </tr>
+            </div>
           </form>
         </div>
       </div>
@@ -233,8 +264,8 @@
         <button
           type="button"
           class="btn btn-primary"
-          data-bs-dismiss="modal"
-          (click)="savestudent()"
+          (click)="savestudent(studentForm)"
+          [disabled]="!studentForm.form.valid"
         >
           Submit
         </button>
@@ -253,8 +284,8 @@
       <th class="table1">Father Name</th>
       <th class="table1">Date of Birth</th>
       <th class="table1">Gender</th>
-      <th class="table1">Nrc Exists</th>
-      <th class="table1">Nrc</th>
+      <th class="table1">NRC Exists</th>
+      <th class="table1">NRC</th>
       <th class="table1">Action</th>
     </tr>
   </thead>
@@ -266,7 +297,7 @@
           | paginate : { itemsPerPage: pageSize, currentPage: currentPage }
       "
     >
-      <td>{{ result.id }}</td>
+      <td class="text">{{ result.id }}</td>
       <td>{{ result.name }}</td>
       <td>{{ result.father_name }}</td>
       <td>{{ result.date_of_birth | date : "yyyy-MM-dd" : "UTC" }}</td>
@@ -324,9 +355,9 @@
       <div class="modal-body">
         <div class="container-fluid">
           <form>
-            <tr class="mb-3">
-              <td><label for="identify" class="form-label">ID</label></td>
-              <td>
+            <div class="mb-3">
+              <td><label for="identify" class="form-label">ID:</label></td>
+              <td class="idbox">
                 <input
                   type="number"
                   placeholder="Enter your Id"
@@ -339,12 +370,12 @@
                   aria-describedby="emailHelp"
                 />
               </td>
-            </tr>
-            <tr class="mb-3">
+            </div>
+            <div class="mb-3">
               <td>
-                <label for="exampleInputEmail1" class="form-label">Name</label>
+                <label for="exampleInputEmail1" class="form-label">Name:</label>
               </td>
-              <td>
+              <td class="namebox">
                 <input
                   type="text"
                   placeholder="Enter your name"
@@ -355,14 +386,14 @@
                   aria-describedby="emailHelp"
                 />
               </td>
-            </tr>
-            <tr class="mb-3">
+            </div>
+            <div class="mb-3">
               <td>
                 <label for="exampleInputPassword1" class="form-label"
-                  >Father Name</label
+                  >Father Name:</label
                 >
               </td>
-              <td>
+              <td class="farbox">
                 <input
                   type="text"
                   placeholder="Enter name"
@@ -373,10 +404,10 @@
                   required
                 />
               </td>
-            </tr>
-            <tr class="mb-3">
+            </div>
+            <div class="mb-3">
               <td><label for="datepicker">Date of Birth:</label></td>
-              <td>
+              <td class="datebox">
                 <input
                   class="form-control"
                   type="date"
@@ -385,30 +416,39 @@
                   [(ngModel)]="array.date_of_birth"
                 />
               </td>
-            </tr>
+            </div>
             <div class="mb-3">
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="inlineRadio1"
-                  value="option1"
-                />
-                <label class="form-check-label" for="inlineRadio1">Male</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="inlineRadio2"
-                  value="option2"
-                />
-                <label class="form-check-label" for="inlineRadio2"
-                  >Female</label
-                >
-              </div>
+              <td>
+                <label for="gender">Gender:</label>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="inlineRadioOptions"
+                    id="inlineRadio1"
+                    (change)="gendermale()"
+                    [(ngModel)]="array.gender"
+                    [value]="false"
+                  />
+                  <label class="form-check-label" for="inlineRadio1"
+                    >Male</label
+                  >
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="inlineRadioOptions"
+                    id="inlineRadio2"
+                    (change)="genderfemale()"
+                    [(ngModel)]="array.gender"
+                    [value]="true"
+                  />
+                  <label class="form-check-label" for="inlineRadio2"
+                    >Female</label
+                  >
+                </div>
+              </td>
             </div>
             <div class="mb-3 form-check">
               <label class="form-check-label" for="exampleCheck1"
@@ -420,14 +460,15 @@
                 name="nrc_exists"
                 id="exampleCheck1"
                 [(ngModel)]="array.nrc_exists"
+                (change)="clearNrc()"
               />
             </div>
 
-            <tr class="mb-3">
+            <div class="mb-3">
               <td>
-                <label for="exampleInputEmail1" class="form-label">NRC</label>
+                <label for="exampleInputEmail1" class="form-label">NRC:</label>
               </td>
-              <td>
+              <td class="nrcbox">
                 <input
                   type="text"
                   placeholder="Enter your NRC"
@@ -436,9 +477,10 @@
                   id="exampleInputEmail1"
                   [(ngModel)]="array.nrc"
                   [disabled]="!array.nrc_exists"
+                  (change)="clearNrc()"
                 />
               </td>
-            </tr>
+            </div>
           </form>
         </div>
       </div>
@@ -491,4 +533,3 @@
     </div>
   </div>
 </div>
-<input type="file" (change)="importFromExcel($event)" />
