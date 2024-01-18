@@ -296,6 +296,7 @@
           | search : searchText
           | paginate : { itemsPerPage: pageSize, currentPage: currentPage }
       "
+      [routerLink]="['/student', result.id]"
     >
       <td class="text">{{ result.id }}</td>
       <td>{{ result.name }}</td>

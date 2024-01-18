@@ -25,4 +25,16 @@ export class ApiService {
       data
     );
   }
+  examResultApiData(data: any) {
+    return this.http.post(`http://localhost:3000/api/v1/examresults`, data);
+  }
+  findall(data: any) {
+    return this.http.post(`http://localhost:3000/api/v1/examresults`, data);
+  }
+  getMarks(id: any) {
+    return this.http.get(`http://localhost:3000/api/v1/examresults/${id}`);
+  }
+  deleteMarks(id: any) {
+    return this.http.delete(`http://localhost:3000/api/v1/examresults/${id}`);
+  }
 }

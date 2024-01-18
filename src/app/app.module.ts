@@ -8,9 +8,10 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { GenderPipe } from './gender.pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { SearchPipe } from './search.pipe';
+import { DetailsComponent } from './details/details.component';
 
 @NgModule({
-  declarations: [AppComponent, StudentFormComponent, GenderPipe, SearchPipe],
+  declarations: [AppComponent, StudentFormComponent, GenderPipe, SearchPipe, DetailsComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
