@@ -26,7 +26,7 @@ export class ApiService {
     );
   }
   examResultApiData(data: any) {
-    return this.http.post(`http://localhost:3000/api/v1/examresults`, data);
+    return this.http.post('http://localhost:3000/api/v1/examresults', data);
   }
   findall(data: any) {
     return this.http.post(`http://localhost:3000/api/v1/examresults`, data);

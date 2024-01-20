@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../service/api.service';
 import { Router } from '@angular/router';
-import { StudentFormComponent } from '../student-form/student-form.component';
 import { ActivatedRoute } from '@angular/router';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-details',
@@ -18,6 +18,16 @@ export class DetailsComponent implements OnInit {
     private router: ActivatedRoute,
     private route: Router
   ) {}
+
+  SchoolYear!: string;
+  Myanmar!: number;
+  English!: number;
+  Mathematics!: number;
+  Physics!: number;
+  Chemistry!: number;
+  Bio_Eco!: number;
+  totalMarks!: number;
+  result!: string;
   items: string[] = [
     'First',
     'Second',
@@ -26,34 +36,24 @@ export class DetailsComponent implements OnInit {
     'Qualified',
     'Final',
   ];
-  results: string[] = ['Passed', 'Failed'];
+  exams: string[] = ['Passed', 'Failed'];
+  myResult!: string;
 
   selectedOption: string = '';
   datas: any[] = [];
   rows: any[] = [];
   tbody: any[] = [];
   button: any[] = [];
-  ExamResults: any[] = [];
-  SchoolYear: string = '';
-  Myanmar!: 0;
-  English!: 0;
-  Mathematics!: 0;
-  Chemistry!: 0;
-  Physics!: 0;
-  Bio_Eco!: 0;
-  totalMarks!: 0;
-  id!: number;
-  marks: any = {};
-  student = this.router.snapshot.paramMap.get('id');
+  myRows: any[] = [];
+
+  student_id = this.router.snapshot.paramMap.get('id');
 
   showSuccessMessage = false;
 
   ngOnInit(): void {
     this.getMark();
   }
-  // isValidNumber(num: number | undefined): boolean {
-  //   return typeof num === 'number' && !isNaN(num);
-  // }
+
   // SAVE
   async saveData() {
     // if (
@@ -88,21 +88,22 @@ export class DetailsComponent implements OnInit {
 
     // const result = totalMarks >= 40 ? 'Passed' : 'Failed';
 
-    var ExamResults = {
+    var myExamresults = {
+      id: this.student_id,
       SchoolYear: this.SchoolYear,
       Myanmar: this.Myanmar,
       English: this.English,
       Mathematics: this.Mathematics,
-      Chemistry: this.Chemistry,
       Physics: this.Physics,
+      Chemistry: this.Chemistry,
       Bio_Eco: this.Bio_Eco,
       Total: this.totalMarks,
-      Result: this.results,
+      Result: this.result == 'Passed' ? true : false,
     };
-    console.log(this.ExamResults);
-    await this.service.examResultApiData(ExamResults).subscribe({
+    console.log(myExamresults);
+    await this.service.examResultApiData(myExamresults).subscribe({
       next: (result: any) => {
-        console.log('Student adds successfully!');
+        console.log('Data add successfully!');
 
         // this.results.push(ExamResults);
         // form.resetForm();
@@ -115,8 +116,8 @@ export class DetailsComponent implements OnInit {
       },
 
       error: (error: any) => {
-        console.log('FAIL', error);
-        alert('Fail');
+        console.log('Data add fail!', error);
+        alert('Data add fail!');
       },
     });
   }
@@ -124,12 +125,10 @@ export class DetailsComponent implements OnInit {
   // FindAll
   async findAll() {
     console.log('>>>>>>ERROR>>>>');
-    await this.service.findall(this.student).subscribe({
+    await this.service.findall(this.student_id).subscribe({
       next: (result: any) => {
         console.log('ADD SUCCESSFULLY!', result);
-        console.log(result);
-        this.rows = result.data;
-        console.log(this.rows);
+
         // descending order
         // result.data.sort((a: any, b: any) => a.id - b.id);
       },
@@ -140,15 +139,20 @@ export class DetailsComponent implements OnInit {
   }
   // Table RS
   async getMark() {
-    console.log('>>>>>>><<<<<<<<<<<<');
-    await this.service.getMarks(this.student).subscribe({
+    console.log('>>>>>>>GetMark<<<<<<<<<<<<');
+    await this.service.getMarks(this.student_id).subscribe({
       next: (result: any) => {
-        console.log('ADD SUCCESSFULLY!', result);
-        console.log(result);
+        // console.log('ADD SUCCESSFULLY!', result);
+
         this.rows = result.data;
-        this.student = result.student;
-        console.log(this.student);
+        this.myRows = result.data[0].Result;
+
+        // console.log(this.student);
         console.log(this.rows);
+        this.myRows.forEach((items) => {
+          items.Result = items.Result ? 'Passed' : 'Failed';
+        });
+
         // descending order
         // result.data.sort((a: any, b: any) => a.id - b.id);
       },
@@ -169,15 +173,38 @@ export class DetailsComponent implements OnInit {
 
   // Delete
   async deleteMark(id: any) {
+    console.log('>>>>>>>>>>>><<<<<<<<<<');
     await this.service.deleteMarks(id).subscribe({
       next: (result: any) => {
         console.log('Deleted Sussessfully!');
-        this.removeObjectById(this.rows, id);
+        this.removeObjectById(this.myRows, id);
       },
       error: (error: any) => {
         alert('FAIL!');
       },
     });
+  }
+
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CRUD>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+  // Export Excel
+  exportToExcel(data: any[], fileName: string): void {
+    // Exclude unwanted columns (e.g., CreatedAt and UpdatedAt)
+    const excludedColumns = ['createdAt', 'updatedAt'];
+    const modifiedData = data.map((item) => {
+      const newItem = { ...item };
+      // if (newItem.gender !== undefined) {
+      //   newItem.gender == newItem.gender ? 'Male' : 'Female';
+      // }
+      excludedColumns.forEach((column) => delete newItem[column]);
+      return newItem;
+    });
+    // Convert modified data to Excel worksheet
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(modifiedData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    // Save the workbook to an Excel file
+    XLSX.writeFile(wb, `${fileName}.xlsx`);
   }
 
   routeToStudent() {
@@ -191,11 +218,9 @@ export class DetailsComponent implements OnInit {
       tbody.remove();
     }
   }
-  // getId(id: any) {
-  //   return (this.id = id);
-  // }
+
   plus() {
-    this.rows.push({
+    this.datas.push({
       /* Initial data for a new tbody */
     });
   }

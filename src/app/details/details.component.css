@@ -72,8 +72,7 @@
 }
 .idbox {
   width: 65%;
-  margin-left: 30px;
-
+  margin-left: 50px;
 }
 
 .namebox {
@@ -93,18 +92,27 @@
   margin-left: 30px;
 }
 form {
-  margin-left: 15px;
+  margin-left: 10px;
   width: 85%;
   padding: 20px;
 }
 .ml {
-    /* width: 200px; */
-  margin-left: 40px;
-  
-  }
-.date{margin-left: 57px;
-  width: 115%;}
-  
+  width: 150%;
+  margin-left: 50px;
+}
+.date {
+  margin-left: 66px;
+  width: 170%;
+}
+
+.gen {
+  margin-left: 105px;
+}
+
+.nrc{
+  margin-left: 165px;
+}
+
 .plus {
   background-color: #9870f5;
   color: #ffff;
@@ -126,3 +134,6 @@ form {
 .custom-margin-left {
   margin-left: 20px; /* Adjust the value as needed */
 }
+.delete{ background-color: rgb(240, 19, 85);
+  border: rgb(243, 236, 236);
+  color: #ffff;}
