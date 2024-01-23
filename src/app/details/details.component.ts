@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../service/api.service';
+
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import * as XLSX from 'xlsx';
@@ -11,6 +12,7 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./details.component.css'],
 })
 export class DetailsComponent implements OnInit {
+  @ViewChild('fileInput') fileInput!: ElementRef;
   studentRoute: any;
   constructor(
     private http: HttpClient,
@@ -49,6 +51,7 @@ export class DetailsComponent implements OnInit {
   student_id = this.router.snapshot.paramMap.get('id');
 
   showSuccessMessage = false;
+  showErrorMessage = false;
 
   ngOnInit(): void {
     this.getMark();
@@ -205,6 +208,73 @@ export class DetailsComponent implements OnInit {
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     // Save the workbook to an Excel file
     XLSX.writeFile(wb, `${fileName}.xlsx`);
+  }
+
+  // Import from Excel
+  importFromExcel(event: any): void {
+    const file: File = event.target.files[0];
+    const reader: FileReader = new FileReader();
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const data = e.target.result;
+        const binaryString: string = e.target.result;
+        const workbook: XLSX.WorkBook = XLSX.read(binaryString, {
+          type: 'binary',
+        });
+        const sheetName: string = workbook.SheetNames[0];
+        const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
+        const importedData: any[] = XLSX.utils.sheet_to_json(worksheet, {
+          raw: true,
+        });
+
+        for (const row of importedData) {
+          const idSet = new Set();
+
+          if (typeof row.Result !== 'boolean' || row.Result == null) {
+            console.error(
+              'Invalid result in Excel data. Result must be "Passed" or "Failed".'
+            );
+            this.showErrorMessage = true;
+            setTimeout(() => {
+              this.showErrorMessage = false;
+            }, 3000);
+            event.target.value = null;
+            return; // Exit function if gender is invalid
+          }
+        }
+
+        console.log(importedData);
+
+        this.service.bulkcreate(importedData).subscribe({
+          next: (result: any) => {
+            console.log('Excel datas saved successfully', result);
+            this.getMark();
+            this.showErrorMessage = true;
+            setTimeout(() => {
+              this.showErrorMessage = false;
+            }, 3000);
+            event.target.value = null;
+          },
+          error: (error: any) => {
+            console.log('Error Saving datas form Excel', error);
+            alert('Excel import failed. Please try again.');
+          },
+        });
+      };
+      reader.readAsBinaryString(file);
+    }
+  }
+
+  openFileInput() {
+    this.fileInput.nativeElement.click();
+  }
+  //Validation for Myanmar
+  validateMyanmarValue(value: number): { [key: string]: boolean } | null {
+    if (value > 100) {
+      return { invalidMyanmarValue: true };
+    }
+    return null;
   }
 
   routeToStudent() {

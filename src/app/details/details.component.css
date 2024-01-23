@@ -1,13 +1,19 @@
 .navbar {
-  background: linear-gradient(#ff9494, #9870f5);
-  margin-bottom: 10px;
+  /* background: linear-gradient(#ff9494, #9870f5); */
+  background-color:  #ede6e6;
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+  margin-bottom: 20px;
   box-shadow: 0 4px 6px rgba(208, 3, 3, 0.1);
 }
 .navbar-brand {
-  color: #ffff;
+  color:#1b83b3;
   text-decoration: none;
   font-weight: bold;
   transition: 3s;
+  z-index: 1000;
+ 
 }
 .nav-item a:hover {
   color: #ffff;
@@ -17,7 +23,9 @@
 }
 .btn {
   /* margin-left: 20%; */
-  background-color: rgb(240, 19, 85);
+  background-color: #1e8ec2;
+  /* background-color: #cf0e0e; */
+  /* background-color: rgb(240, 19, 85); */
   border: rgb(243, 236, 236);
   color: #ffff;
 }
@@ -35,19 +43,19 @@
 .table1 {
   margin-left: 5px;
   width: 13%;
-  background-color: #9870f5;
-  color: azure;
+  background-color:  #1e8ec2;
+  color:  #ede6e6;
   border-right: 1px solid white; /* Add a white border to the right of each th */
 }
 .table2 {
-  background-color: #9870f5;
-  color: azure;
+  background-color:  #1e8ec2;
+  color:  #ede6e6;
 
   border-right: 1px solid white; /* Add a white border to the right of each th */
 }
 .table3 {
-  background-color: #9870f5;
-  color: azure;
+  background-color: #1e8ec2;
+  color: #ede6e6;
   width: 10%;
   border-right: 1px solid white; /* Add a white border to the right of each th */
 }
@@ -59,11 +67,12 @@
     z-index: 100;
     padding-top: 2px;
   } */
-.btn-sm {
+/* .btn-sm {
+  
   background-color: rgb(240, 19, 85);
   border: rgb(243, 236, 236);
   color: #ffff;
-}
+} */
 .form-container {
   width: 100%;
 }
@@ -73,6 +82,9 @@
 .idbox {
   width: 65%;
   margin-left: 50px;
+  margin-top: 70px; /* Adjust the value as needed */
+  position: relative;
+  z-index: 1; 
 }
 
 .namebox {
@@ -114,12 +126,13 @@ form {
 }
 
 .plus {
-  background-color: #9870f5;
+  background-color: #1e8ec2;
   color: #ffff;
   margin-left: 3px;
 }
 .delete-button {
-  background-color: rgb(240, 19, 85);
+  background-color: #1e8ec2;
+
   color: #ffff;
   border: rgb(243, 236, 236);
 }
@@ -134,6 +147,6 @@ form {
 .custom-margin-left {
   margin-left: 20px; /* Adjust the value as needed */
 }
-.delete{ background-color: rgb(240, 19, 85);
+.delete{ background-color: #1e8ec2;
   border: rgb(243, 236, 236);
   color: #ffff;}

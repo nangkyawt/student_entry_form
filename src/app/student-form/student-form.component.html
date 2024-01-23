@@ -15,20 +15,18 @@
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">STUDENTS FORM</a>
-    <nav class="navbar bg-body-tertiary">
+    <div class="mx-auto">
       <form class="d-flex" role="search">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         <input
-          class="form-control me-2"
+          class="form-control"
           type="search"
           name="search"
           [(ngModel)]="searchText"
           placeholder="Search"
           aria-label="Search"
         />
-        <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
-    </nav>
+    </div>
 
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
@@ -49,14 +47,17 @@
           </button>
         </li>
 
-        <button
-          type="button"
-          class="export btn"
-          data-bs="modal"
-          (click)="exportToExcel(results, 'studentForm')"
-        >
-          Export
-        </button>
+        <li>
+          <button
+            type="button"
+            class="export btn"
+            data-bs="modal"
+            (click)="exportToExcel(results, 'studentForm')"
+          >
+            Export
+          </button>
+        </li>
+
         <li class="nav-item">
           <button
             type="button"
@@ -296,7 +297,7 @@
           | search : searchText
           | paginate : { itemsPerPage: pageSize, currentPage: currentPage }
       "
-      [routerLink]="['/student', result.id]"
+      [routerLink]="shouldnavigate ? ['/student', result.id] : null"
     >
       <td class="text">{{ result.id }}</td>
       <td>{{ result.name }}</td>

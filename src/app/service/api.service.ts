@@ -37,4 +37,10 @@ export class ApiService {
   deleteMarks(id: any) {
     return this.http.delete(`http://localhost:3000/api/v1/examresults/${id}`);
   }
+  bulkcreate(data: any) {
+    return this.http.post(
+      `http://localhost:3000/api/v1/examresults//bulkCreate`,
+      data
+    );
+  }
 }

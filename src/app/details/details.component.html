@@ -1,7 +1,10 @@
 <div *ngIf="showSuccessMessage" class="alert alert-success" role="alert">
-  Successfully!
+  Saved Successfully!
 </div>
-<nav class="navbar navbar-expand-lg fixed-top">
+<div *ngIf="showErrorMessage" class="alert alert-danger" role="alert">
+  Import Failed!
+</div>
+<nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Mark Template</a>
     <nav class="navbar bg-body-tertiary"></nav>
@@ -61,10 +64,37 @@
           type="button"
           class="export btn"
           data-bs="modal"
-          (click)="exportToExcel(rows, '')"
+          (click)="exportToExcel(myRows, 'DetailMark')"
         >
+          <i class="fa fa-share-square" aria-hidden="true"></i>
+
           Export
         </button>
+
+        <button
+          type="button"
+          class="export btn"
+          data-bs="modal"
+          (click)="openFileInput()"
+        >
+          <input
+            type="file"
+            (change)="importFromExcel($event)"
+            #fileInput
+            style="display: none"
+          /><i class="fa fa-arrow-circle-down" aria-hidden="true"></i>
+          Import
+        </button>
+
+        <!-- <button
+          type="button"
+          class="export btn"
+          data-bs="modal"
+          (click)="exportToExcel(myRows, 'DetailMark')"
+        >
+          <i class="fa fa-arrow-circle-down" aria-hidden="true"></i>
+          Import
+        </button> -->
       </ul>
     </div>
   </div>
@@ -227,9 +257,24 @@
             </select>
           </div>
         </td>
-
+        <!-- <td class="mt-1">
+          <div class="input-group-sm" for="myanmar">
+            <input
+              type="number"
+              class="form-control"
+              id="myanmar"
+              name="myanmar"
+              #myanmar="ngModel"
+              [(ngModel)]="row.Myanmar"
+              aria-describedby="emailHelp"
+            />
+          </div>
+          <span class="span" *ngIf="myanmar.touched && myanmar.errors"
+            >Myanmar value must be 100.</span
+          >
+        </td> -->
         <td class="mt-1">
-          <div class="input-group-sm">
+          <div class="input-group-sm" for="myanmarInput">
             <input
               type="number"
               class="form-control"
@@ -237,9 +282,20 @@
               name="myanmar"
               [(ngModel)]="row.Myanmar"
               aria-describedby="emailHelp"
+              #myanmarInput="ngModel"
+              [ngClass]="{
+                'is-invalid': myanmarInput.invalid && myanmarInput.touched
+              }"
             />
           </div>
+          <div
+            *ngIf="myanmarInput.invalid && myanmarInput.touched"
+            class="invalid-feedback"
+          >
+            Myanmar value must be 100 or below.
+          </div>
         </td>
+
         <td class="mt-1">
           <div class="input-group-sm">
             <input
@@ -452,6 +508,43 @@
             </select>
           </div>
         </td>
+        <!-- <td class="modal" tabindex="-1" id="delete">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Delete</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  ata-bs-target="#exampleModal1"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure want to delete?</p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  value="delete"
+                  class="btn btn danger"
+                  data-bs-dismiss="modal"
+                  (click)="deleteRow()"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </td> -->
         <td>
           <button
             type="button"

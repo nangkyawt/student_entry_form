@@ -1,9 +1,13 @@
 .navbar {
-  background: linear-gradient(#ff9494, #9870f5);
-  margin-bottom: 10px;
+  /* background: linear-gradient(#ff9494, #9870f5); */
+  background-color:  #ede6e6;
+  margin-bottom: 20px;
+ 
+  box-shadow: 0 4px 6px rgba(208, 3, 3, 0.1);
 }
 .navbar-brand {
-  color: #ffff;
+  color: #1b83b3;
+  
   text-decoration: none;
   font-weight: bold;
   transition: 3s;
@@ -13,7 +17,7 @@
 }
 .btn {
   /* margin-left: 20%; */
-  background-color: rgb(240, 19, 85);
+  background-color: #1e8ec2;
   border: rgb(243, 236, 236);
   color: #ffff;
 }
@@ -24,24 +28,29 @@
   margin-bottom: auto;
 }
 .newbtn {
-  background-color: rgb(240, 19, 85);
+  background-color: #1e8ec2;
   border: rgb(243, 236, 236);
   color: #ffff;
 }
 span {
   color: red;
 }
+.search{
+  /* background-color: #1e8ec2; */
+  color: #ffff;
+  margin-right: 10px;
+}
 
 .modal-header {
-  background: linear-gradient(to left, #ff9494, #9870f5);
+  background: #1e8ec2
 }
 
 .modal-title {
   color: #ffff;
 }
-.modal-footer {
+/* .modal-footer {
   color: #ffff;
-}
+} */
 .modal {
   box-shadow: 0 2px 10px rgba(231, 42, 4, 0.1);
 }
@@ -55,9 +64,13 @@ input {
   color: red;
 }
 .table1 {
-  background-color: #9870f5;
+  background-color:#1e8ec2;
   color: azure;
 }
+
+/* .search{
+  background-color:  #ede6e6;
+} */
 
 input[type="file"] {
   margin-top: 10px;

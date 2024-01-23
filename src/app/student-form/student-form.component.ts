@@ -20,7 +20,7 @@ export class StudentFormComponent implements OnInit {
   results: any = [];
   array: any = [];
   excel_data: any = [];
-
+  shouldnavigate = true;
   showSuccessMessage = false;
   showErrorMessage = false;
   showGenderErrorMessage = false;
@@ -315,6 +315,10 @@ export class StudentFormComponent implements OnInit {
   getarray(data: any) {
     //data assign
     this.array = data;
+    this.shouldnavigate = false;
+  }
+  nonavigate() {
+    this.shouldnavigate = true;
   }
 
   // Validation

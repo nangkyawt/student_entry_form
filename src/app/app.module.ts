@@ -11,7 +11,13 @@ import { SearchPipe } from './search.pipe';
 import { DetailsComponent } from './details/details.component';
 
 @NgModule({
-  declarations: [AppComponent, StudentFormComponent, GenderPipe, SearchPipe, DetailsComponent],
+  declarations: [
+    AppComponent,
+    StudentFormComponent,
+    GenderPipe,
+    SearchPipe,
+    DetailsComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
