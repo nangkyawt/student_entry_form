@@ -45,8 +45,9 @@ export class DetailsComponent implements OnInit {
   datas: any[] = [];
   rows: any[] = [];
   tbody: any[] = [];
-  button: any[] = [];
+  hello: any[] = [];
   myRows: any[] = [];
+  array: any[] = [];
 
   student_id = this.router.snapshot.paramMap.get('id');
 
@@ -187,6 +188,27 @@ export class DetailsComponent implements OnInit {
       },
     });
   }
+
+  // Update
+  // async updateMark() {
+  //   var updatedata = {
+  //     name: this.array.name,
+  //     father_name: this.array.father_name,
+  //     date_of_birth: this.array.date_of_birth || Date.now(),
+  //     gender: this.array.gender,
+  //     nrc_exists: this.array.nrc_exists,
+  //     nrc: this.array.nrc || null,
+  //   };
+  //   await this.service.updatestudents(this.array.id, updatedata).subscribe({
+  //     next: (result: any) => {
+  //       console.log('Updated Successfully!', result);
+  //       this.getMark();
+  //     },
+  //     error: (error: any) => {
+  //       alert('FAIL!');
+  //     },
+  //   });
+  // }
 
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CRUD>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
