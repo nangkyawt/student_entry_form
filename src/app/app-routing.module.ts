@@ -7,16 +7,13 @@ const routes: Routes = [
   {
     path: ' ',
     redirectTo: 'student',
-    // pathMatch: 'full',
+    pathMatch: 'full',
   },
   {
     path: 'student',
     component: StudentFormComponent,
   },
-  {
-    path: 'student/:id',
-    component: DetailsComponent,
-  },
+  { path: 'details', component: DetailsComponent },
 ];
 
 @NgModule({

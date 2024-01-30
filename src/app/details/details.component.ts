@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../service/api.service';
-
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import * as XLSX from 'xlsx';
+import { FormDataModel } from './detail';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 @Component({
   selector: 'app-details',
@@ -13,23 +14,31 @@ import * as XLSX from 'xlsx';
 })
 export class DetailsComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
+
   studentRoute: any;
+
   constructor(
     private http: HttpClient,
     private service: ApiService,
     private router: ActivatedRoute,
     private route: Router
   ) {}
+  Student_id: any;
+  // SchoolYear!: string;
+  // Myanmar!: number;
+  // English!: number;
+  // Mathematics!: number;
+  // Physics!: number;
+  // Chemistry!: number;
+  // Bio_Eco!: number;
+  // totalMarks!: number;
+  // result!: string;
+  // Total!: number;
+  // Result!: boolean;
+  // id!: number;
 
-  SchoolYear!: string;
-  Myanmar!: number;
-  English!: number;
-  Mathematics!: number;
-  Physics!: number;
-  Chemistry!: number;
-  Bio_Eco!: number;
-  totalMarks!: number;
-  result!: string;
+  // array: any = [];
+
   items: string[] = [
     'First',
     'Second',
@@ -38,98 +47,199 @@ export class DetailsComponent implements OnInit {
     'Qualified',
     'Final',
   ];
-  exams: string[] = ['Passed', 'Failed'];
+  // exams: string[] = ['Passed', 'Failed'];
   myResult!: string;
 
   selectedOption: string = '';
-  datas: any[] = [];
-  rows: any[] = [];
-  tbody: any[] = [];
-  hello: any[] = [];
-  myRows: any[] = [];
-  array: any[] = [];
+  datas: FormDataModel[] = [];
+  rows: any = {};
+  array: any = [];
 
-  student_id = this.router.snapshot.paramMap.get('id');
+  // myRows: any[] = [];
+  myRows: any[] = [];
+
+  // Student_id = this.router.snapshot.paramMap.get('id');
 
   showSuccessMessage = false;
   showErrorMessage = false;
 
   ngOnInit(): void {
-    this.getMark();
+    console.log('ngOnInit- Data:', this.datas);
+    this.Student_id = this.service.getStudentId();
+    if (this.Student_id != null) {
+      this.getMark();
+    }
+    // this.loadFromLocalStorage();
+    // this.initializeData();
+
+    console.log('myRows:', this.myRows);
+    console.log('datas:', this.datas);
+    // this.route.navigate(['/details'], { replaceUrl: true });
+  }
+
+  trackByFn(index: number, item: FormDataModel): number {
+    return item.id; // Assuming 'id' is a unique identifier in your FormDataModel
+  }
+
+  plus() {
+    const newFormData: FormDataModel = new FormDataModel();
+    this.datas.push(newFormData);
+    console.log('Data after adding:', this.datas);
+    // this.saveToLocalStorage();
+  }
+  // retrieveFromLocalStorage() {
+  //   const value = this.saveToLocalStorage.getItem('myKey');
+  //   console.log(value);
+  // }
+  // initializeData() {
+  //   // If datas is empty (e.g., first visit or local storage was cleared), initialize it with a default value.
+  //   if (this.datas.length === 0) {
+  //     const defaultFormData: FormDataModel = new FormDataModel();
+  //     this.datas.push(defaultFormData);
+  //   }
+  // }
+
+  // loadFromLocalStorage() {
+  //   const key = 'formdata';
+  //   const storedData = localStorage.getItem(key);
+
+  //   if (storedData) {
+  //     this.datas = JSON.parse(storedData);
+  //     console.log('Data loaded from local storage:', this.datas);
+  //     // Update your page with the loaded data here
+  //   } else {
+  //     console.log('No data found in local storage');
+  //   }
+  // }
+  // saveToLocalStorage() {
+  //   // Convert the data to a JSON string before saving
+  //   try {
+  //     console.log('Data to be saved', this.datas);
+  //     const key = 'formdata';
+  //     localStorage.setItem(key, JSON.stringify(this.datas));
+  //   } catch (error) {
+  //     console.error('Error saving to local storage', error);
+  //   }
+  // }
+
+  async saveData(form: any) {
+    for (let data of this.datas) {
+      const totalMarks =
+        data.Myanmar +
+        data.English +
+        data.Mathematics +
+        data.Chemistry +
+        data.Physics +
+        data.Bio_Eco;
+      console.log('Total Marks:', totalMarks);
+
+      const Result = totalMarks >= 40 ? 'Passed' : 'Failed';
+
+      var myExamresults = {
+        Student_id: this.Student_id,
+        SchoolYear: data.SchoolYear,
+        Myanmar: data.Myanmar,
+        English: data.English,
+        Mathematics: data.Mathematics,
+        Physics: data.Physics,
+        Chemistry: data.Chemistry,
+        Bio_Eco: data.Bio_Eco,
+        Total: totalMarks,
+        Result: Result == 'Passed' ? true : false,
+      };
+      if (this.array.Student_id) {
+        // If Student_id exists, it means we are in update mode
+        await this.service
+          .updateMarks(this.array.Student_id, myExamresults)
+          .subscribe({
+            next: (result: any) => {
+              console.log('Updated Successfully!', result);
+              this.getMark();
+              this.showSuccessMessage = true;
+            },
+            error: (error: any) => {
+              console.log('Update Failed!', error);
+              alert('Update failed!');
+            },
+          });
+      } else {
+        // If Student_id doesn't exist, it means we are in save mode
+        await this.service.examResultApiData(myExamresults).subscribe({
+          next: (_result: any) => {
+            console.log('Data added successfully!');
+            data.totalMarks = totalMarks;
+            data.result = Result;
+            this.showSuccessMessage = true;
+          },
+          error: (error: any) => {
+            console.log('Data add failed!', error);
+            alert('Data add failed!');
+          },
+        });
+      }
+
+      setTimeout(() => {
+        this.showSuccessMessage = false;
+      }, 3000);
+    }
   }
 
   // SAVE
-  async saveData() {
-    // if (
-    //   this.isValidNumber(this.Myanmar) &&
-    //   this.isValidNumber(this.English) &&
-    //   this.isValidNumber(this.Mathematics) &&
-    //   this.isValidNumber(this.Chemistry) &&
-    //   this.isValidNumber(this.Physics) &&
-    //   this.isValidNumber(this.Bio_Eco)
-    // ) {
-    //   const totalMarks =
-    //     this.Myanmar +
-    //     this.English +
-    //     this.Mathematics +
-    //     this.Chemistry +
-    //     this.Physics +
-    //     this.Bio_Eco;
+  // async saveData(form: any) {
+  //   for (let data of this.datas) {
+  //     const totalMarks =
+  //       data.Myanmar +
+  //       data.English +
+  //       data.Mathematics +
+  //       data.Chemistry +
+  //       data.Physics +
+  //       data.Bio_Eco;
+  //     console.log('Total Marks:', totalMarks);
 
-    //   console.log('Total Marks:', totalMarks);
-    // } else {
-    //   console.error('Invalid or missing marks for one or more subjects.');
-    // }
+  //     const Result = totalMarks >= 40 ? 'Passed' : 'Failed';
+  //     var myExamresults = {
+  //       Student_id: this.Student_id,
+  //       SchoolYear: data.SchoolYear,
+  //       Myanmar: data.Myanmar,
+  //       English: data.English,
+  //       Mathematics: data.Mathematics,
+  //       Physics: data.Physics,
+  //       Chemistry: data.Chemistry,
+  //       Bio_Eco: data.Bio_Eco,
+  //       Total: totalMarks,
+  //       Result: Result == 'Passed' ? true : false,
+  //     };
 
-    // const totalMarks =
-    //   this.Myanmar +
-    //   this.English +
-    //   this.Mathematics +
-    //   this.Chemistry +
-    //   this.Physics +
-    //   this.Bio_Eco;
-    // console.log('Total Marks:', totalMarks);
+  //     console.log(myExamresults);
+  //     await this.service.examResultApiData(myExamresults).subscribe({
+  //       next: (result: any) => {
+  //         console.log('Data add successfully!');
+  //         data.totalMarks = totalMarks;
+  //         data.result = Result;
 
-    // const result = totalMarks >= 40 ? 'Passed' : 'Failed';
+  //         // this.results.push(ExamResults);
+  //         // form.resetForm();
+  //         // asscending order
+  //         // this.results.sort((a: any, b: any) => a.id - b.id);
 
-    var myExamresults = {
-      id: this.student_id,
-      SchoolYear: this.SchoolYear,
-      Myanmar: this.Myanmar,
-      English: this.English,
-      Mathematics: this.Mathematics,
-      Physics: this.Physics,
-      Chemistry: this.Chemistry,
-      Bio_Eco: this.Bio_Eco,
-      Total: this.totalMarks,
-      Result: this.result == 'Passed' ? true : false,
-    };
-    console.log(myExamresults);
-    await this.service.examResultApiData(myExamresults).subscribe({
-      next: (result: any) => {
-        console.log('Data add successfully!');
+  //         this.showSuccessMessage = true;
+  //         setTimeout(() => {
+  //           this.showSuccessMessage = false;
+  //         }, 3000);
+  //       },
 
-        // this.results.push(ExamResults);
-        // form.resetForm();
-        // asscending order
-        // this.results.sort((a: any, b: any) => a.id - b.id);
-        this.showSuccessMessage = true;
-        setTimeout(() => {
-          this.showSuccessMessage = false;
-        }, 3000);
-      },
-
-      error: (error: any) => {
-        console.log('Data add fail!', error);
-        alert('Data add fail!');
-      },
-    });
-  }
+  //       error: (error: any) => {
+  //         console.log('Data add fail!', error);
+  //         alert('Data add fail!');
+  //       },
+  //     });
+  //   }
+  // }
 
   // FindAll
   async findAll() {
     console.log('>>>>>>ERROR>>>>');
-    await this.service.findall(this.student_id).subscribe({
+    await this.service.findall().subscribe({
       next: (result: any) => {
         console.log('ADD SUCCESSFULLY!', result);
 
@@ -141,22 +251,30 @@ export class DetailsComponent implements OnInit {
       },
     });
   }
+
   // Table RS
   async getMark() {
-    console.log('>>>>>>>GetMark<<<<<<<<<<<<');
-    await this.service.getMarks(this.student_id).subscribe({
+    await this.service.getMarks(this.Student_id).subscribe({
       next: (result: any) => {
         // console.log('ADD SUCCESSFULLY!', result);
 
-        this.rows = result.data;
-        this.myRows = result.data[0].Result;
+        this.rows = result.data[0];
 
+        this.myRows = result.data[0].exam_results.map((item: any) => ({
+          ...item,
+          Result: item.Result ? 'Passed' : 'Failed',
+        }));
+        console.log('>>>>>>>GetMark<<<<<<<<<<<<');
         // console.log(this.student);
-        console.log(this.rows);
-        this.myRows.forEach((items) => {
-          items.Result = items.Result ? 'Passed' : 'Failed';
-        });
 
+        console.log(this.rows);
+        console.log(this.myRows);
+        // console.log('Rows as JSON:', JSON.stringify(this.rows));
+        // this.myRows.forEach((items) => {
+        //   items.Result = items.Result ? 'Passed' : 'Failed';
+        // });
+        // Add a null check before using forEach
+        // this.saveToLocalStorage();
         // descending order
         // result.data.sort((a: any, b: any) => a.id - b.id);
       },
@@ -176,14 +294,14 @@ export class DetailsComponent implements OnInit {
   }
 
   // Delete
-  async deleteMark(id: any) {
+  async deleteMark(id: number) {
     console.log('>>>>>>>>>>>><<<<<<<<<<');
     await this.service.deleteMarks(id).subscribe({
       next: (result: any) => {
-        console.log('Deleted Sussessfully!');
+        console.log('Deleted Sussessfully!', result);
         this.removeObjectById(this.myRows, id);
       },
-      error: (error: any) => {
+      error: (_error: any) => {
         alert('FAIL!');
       },
     });
@@ -191,45 +309,126 @@ export class DetailsComponent implements OnInit {
 
   // Update
   // async updateMark() {
-  //   var updatedata = {
-  //     name: this.array.name,
-  //     father_name: this.array.father_name,
-  //     date_of_birth: this.array.date_of_birth || Date.now(),
-  //     gender: this.array.gender,
-  //     nrc_exists: this.array.nrc_exists,
-  //     nrc: this.array.nrc || null,
-  //   };
-  //   await this.service.updatestudents(this.array.id, updatedata).subscribe({
-  //     next: (result: any) => {
-  //       console.log('Updated Successfully!', result);
-  //       this.getMark();
-  //     },
-  //     error: (error: any) => {
-  //       alert('FAIL!');
-  //     },
-  //   });
+  //   for (let data of this.datas) {
+  //     const totalMarks =
+  //       data.Myanmar +
+  //       data.English +
+  //       data.Mathematics +
+  //       data.Chemistry +
+  //       data.Physics +
+  //       data.Bio_Eco;
+  //     console.log('Total Marks:', totalMarks);
+
+  //     const Result = totalMarks >= 40 ? 'Passed' : 'Failed';
+  //     var updatedata = {
+  //       Student_id: this.Student_id,
+  //       SchoolYear: data.SchoolYear,
+  //       Myanmar: data.Myanmar,
+  //       English: data.English,
+  //       Mathematics: data.Mathematics,
+  //       Physics: data.Physics,
+  //       Chemistry: data.Chemistry,
+  //       Bio_Eco: data.Bio_Eco,
+  //       Total: totalMarks,
+  //       Result: Result == 'Passed' ? true : false,
+  //     };
+  //     await this.service
+  //       .updateMarks(this.array.Student_id, updatedata)
+  //       .subscribe({
+  //         next: (result: any) => {
+  //           console.log('Updated Successfully!', result);
+  //           this.getMark();
+  //         },
+  //         error: (_error: any) => {
+  //           alert('FAIL!');
+  //         },
+  //       });
+  //   }
   // }
 
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CRUD>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   // Export Excel
+  // exportToExcel(data: any[], fileName: string): void {
+  //   // Exclude unwanted columns (e.g., CreatedAt and UpdatedAt)
+  //   const excludedColumns = ['createdAt', 'updatedAt'];
+  //   const modifiedData = data.map((item) => {
+  //     const newItem = { ...item };
+  //     // if (newItem.gender !== undefined) {
+  //     //   newItem.gender == newItem.gender ? 'Male' : 'Female';
+  //     // }
+  //     excludedColumns.forEach((column) => delete newItem[column]);
+  //     return newItem;
+  //   });
+  //   // Convert modified data to Excel worksheet
+  //   const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(modifiedData);
+  //   const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  //   // Save the workbook to an Excel file
+  //   XLSX.writeFile(wb, `${fileName}.xlsx`);
+  // }
   exportToExcel(data: any[], fileName: string): void {
-    // Exclude unwanted columns (e.g., CreatedAt and UpdatedAt)
-    const excludedColumns = ['createdAt', 'updatedAt'];
+    // Define the columns you want to include in the export
+    const includedColumns = [
+      'Student_id',
+      'Name',
+      'Father_Name',
+      'Date_of_Birth',
+      'Gender',
+      'Nrc_Exists',
+      'Nrc',
+      'SchoolYear',
+      'Myanmar',
+      'English',
+      'Mathematics',
+      'Physics',
+      'Chemistry',
+      'Bio_Eco',
+      'Total',
+      'Result',
+    ];
+
+    // Create a new array with objects containing only the included columns
     const modifiedData = data.map((item) => {
-      const newItem = { ...item };
-      // if (newItem.gender !== undefined) {
-      //   newItem.gender == newItem.gender ? 'Male' : 'Female';
-      // }
-      excludedColumns.forEach((column) => delete newItem[column]);
+      const newItem: any = {};
+      includedColumns.forEach((column) => {
+        newItem[column] = item[column];
+      });
       return newItem;
     });
+
+    // Remove 'createdAt' and 'updatedAt' properties from each object in the array
+    const dataWithoutTimestamps = modifiedData.map((item) => {
+      delete item.createdAt;
+      delete item.updatedAt;
+      return item;
+    });
+
     // Convert modified data to Excel worksheet
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(modifiedData);
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataWithoutTimestamps);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
     // Save the workbook to an Excel file
     XLSX.writeFile(wb, `${fileName}.xlsx`);
+  }
+
+  // Delete all
+  async deleteAllById() {
+    const studentIdToDelete = this.rows?.Student_id;
+
+    if (!studentIdToDelete) {
+      console.error('Student ID is missing.');
+      return;
+    }
+    await this.service.deleteAllByStudentId(studentIdToDelete).subscribe({
+      next: (_result: any) => {
+        console.log('Deleted Sussessfully!');
+      },
+      error: (_error: any) => {
+        alert('FAIL!');
+      },
+    });
   }
 
   // Import from Excel
@@ -288,15 +487,35 @@ export class DetailsComponent implements OnInit {
     }
   }
 
+  new_data(form: any) {
+    form.resetForm();
+    this.myRows = [];
+    // Enable the form fields by removing the 'disabled' attribute
+    const formControls = [
+      'id',
+      'name',
+      'father_name',
+      'datepicker',
+      'Gender',
+      'Nrc_Exists',
+      'nrc',
+    ];
+    formControls.forEach((control) => {
+      const element = document.getElementById(control) as HTMLInputElement;
+      if (element) {
+        element.removeAttribute('disabled');
+      }
+    });
+  }
+
   openFileInput() {
     this.fileInput.nativeElement.click();
   }
-  //Validation for Myanmar
-  validateMyanmarValue(value: number): { [key: string]: boolean } | null {
-    if (value > 100) {
-      return { invalidMyanmarValue: true };
-    }
-    return null;
+
+  // Validation for Myanmar
+  validateMaxValue(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    return value > 100 ? { maxValue: true } : null;
   }
 
   routeToStudent() {
@@ -309,11 +528,5 @@ export class DetailsComponent implements OnInit {
     if (tbody) {
       tbody.remove();
     }
-  }
-
-  plus() {
-    this.datas.push({
-      /* Initial data for a new tbody */
-    });
   }
 }

@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../service/api.service';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { throttle } from 'rxjs';
 import * as XLSX from 'xlsx';
 
@@ -12,7 +13,11 @@ import * as XLSX from 'xlsx';
 export class StudentFormComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
 
-  constructor(private http: HttpClient, private service: ApiService) {}
+  constructor(
+    private http: HttpClient,
+    private service: ApiService,
+    private route: Router
+  ) {}
   pageSize: any = 10;
   currentPage = 1;
   searchText: any;
@@ -28,13 +33,13 @@ export class StudentFormComponent implements OnInit {
   showIdErrorMessage = false;
   showNameErrorMessage = false;
   students = {
-    id: 0,
-    name: '',
-    father_name: '',
-    date_of_birth: '',
-    gender: true,
-    nrc_exists: false,
-    nrc: '',
+    Student_id: 0,
+    Name: '',
+    Father_Name: '',
+    Date_of_Birth: '',
+    Gender: true,
+    Nrc_Exists: false,
+    Nrc: '',
   };
   ngOnInit(): void {
     this.getstudent();
@@ -42,10 +47,10 @@ export class StudentFormComponent implements OnInit {
 
   // radio button
   gendermale() {
-    this.students.gender = false;
+    this.students.Gender = false;
   }
   genderfemale() {
-    this.students.gender = true;
+    this.students.Gender = true;
   }
   // Export to Excel
   exportToExcel(data: any[], fileName: string): void {
@@ -53,8 +58,8 @@ export class StudentFormComponent implements OnInit {
     const excludedColumns = ['createdAt', 'updatedAt'];
     const modifiedData = data.map((item) => {
       const newItem = { ...item };
-      if (newItem.gender !== undefined) {
-        newItem.gender == newItem.gender ? 'Male' : 'Female';
+      if (newItem.Gender !== undefined) {
+        newItem.Gender == newItem.Gender ? 'Male' : 'Female';
       }
       excludedColumns.forEach((column) => delete newItem[column]);
       return newItem;
@@ -212,13 +217,13 @@ export class StudentFormComponent implements OnInit {
   async savestudent(form: any) {
     console.log(this.students);
     var saveData = {
-      id: this.students.id,
-      name: this.students.name,
-      father_name: this.students.father_name,
-      date_of_birth: this.students.date_of_birth,
-      gender: this.students.gender,
-      nrc_exists: this.students.nrc_exists,
-      nrc: this.students.nrc,
+      Student_id: this.students.Student_id,
+      Name: this.students.Name,
+      Father_Name: this.students.Father_Name,
+      Date_of_Birth: this.students.Date_of_Birth,
+      Gender: this.students.Gender,
+      Nrc_Exists: this.students.Nrc_Exists,
+      Nrc: this.students.Nrc,
     };
     await this.service.studentsApiData(saveData).subscribe({
       next: (result: any) => {
@@ -250,7 +255,8 @@ export class StudentFormComponent implements OnInit {
 
         this.results = result.data;
         // descending order
-        result.data.sort((a: any, b: any) => a.id - b.id);
+        console.log(this.results);
+        this.results.sort((a: any, b: any) => a.Student_id - b.Student_id);
       },
       error: (error: any) => {
         console.log('FAIL', error);
@@ -260,7 +266,7 @@ export class StudentFormComponent implements OnInit {
 
   // Delete
   async deletestudent() {
-    await this.service.destroystudents(this.students.id).subscribe({
+    await this.service.destroystudents(this.students.Student_id).subscribe({
       next: (result: any) => {
         console.log('Deleted Sussessfully!');
         this.getstudent();
@@ -273,7 +279,7 @@ export class StudentFormComponent implements OnInit {
 
   // Delete all
   async deleteallstudents() {
-    await this.service.destroystudents(this.students.id).subscribe({
+    await this.service.destroystudents(this.students.Student_id).subscribe({
       next: (result: any) => {
         console.log('Deleted Sussessfully!');
         this.getstudent();
@@ -283,25 +289,28 @@ export class StudentFormComponent implements OnInit {
       },
     });
   }
+
   // Update
   async updatestudent() {
     var updatedata = {
-      name: this.array.name,
-      father_name: this.array.father_name,
-      date_of_birth: this.array.date_of_birth || Date.now(),
-      gender: this.array.gender,
-      nrc_exists: this.array.nrc_exists,
-      nrc: this.array.nrc || null,
+      Name: this.array.Name,
+      Father_Name: this.array.Father_Name,
+      Date_of_birth: this.array.Date_of_Birth || Date.now(),
+      Gender: this.array.Gender,
+      Nrc_Exists: this.array.Nrc_Exists,
+      Nrc: this.array.Nrc || null,
     };
-    await this.service.updatestudents(this.array.id, updatedata).subscribe({
-      next: (result: any) => {
-        console.log('Updated Successfully!', result);
-        this.getstudent();
-      },
-      error: (error: any) => {
-        alert('FAIL!');
-      },
-    });
+    await this.service
+      .updatestudents(this.array.Student_id, updatedata)
+      .subscribe({
+        next: (result: any) => {
+          console.log('Updated Successfully!', result);
+          this.getstudent();
+        },
+        error: (error: any) => {
+          alert('FAIL!');
+        },
+      });
   }
 
   new_data(form: any) {
@@ -309,7 +318,7 @@ export class StudentFormComponent implements OnInit {
   }
 
   getId(id: any) {
-    return (this.students.id = id);
+    return (this.students.Student_id = id);
   }
 
   getarray(data: any) {
@@ -320,13 +329,18 @@ export class StudentFormComponent implements OnInit {
   nonavigate() {
     this.shouldnavigate = true;
   }
+  //route
+  getStudentArrayId(result: any) {
+    this.service.setStudentId(result.Student_id);
+    this.nonavigate();
+  }
 
   // Validation
   valiAge(): boolean {
-    if (!this.students.date_of_birth) {
+    if (!this.students.Date_of_Birth) {
       return false;
     }
-    const birthDate = new Date(this.students.date_of_birth);
+    const birthDate = new Date(this.students.Date_of_Birth);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
 
@@ -334,8 +348,8 @@ export class StudentFormComponent implements OnInit {
   }
   // Clear NRC
   clearNrc() {
-    if (this.students.nrc_exists == false) {
-      this.array.nrc == '';
+    if (this.students.Nrc_Exists == false) {
+      this.array.Nrc == '';
     }
   }
   openFileInput() {
@@ -343,6 +357,11 @@ export class StudentFormComponent implements OnInit {
   }
   toggleNRCInput() {
     throw new Error('Method not implemented.');
+  }
+
+  addStudent() {
+    this.service.setStudentId(null);
+    this.route.navigate(['/details']);
   }
 
   onSubmit() {

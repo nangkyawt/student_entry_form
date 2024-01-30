@@ -20,6 +20,7 @@
             class="btn"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
+            (click)="new_data(detailsForm)"
           >
             <i class="fa fa-plus" aria-hidden="true"></i>
             New
@@ -31,7 +32,7 @@
             class="btn"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
-            (click)="saveData()"
+            (click)="saveData(detailsForm)"
           >
             <i class="fa fa-floppy-o" aria-hidden="true"></i>
             Save
@@ -43,6 +44,7 @@
             class="btn"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
+            (click)="deleteAllById()"
           >
             <i class="fa fa-trash" aria-hidden="true"></i>
             Delete
@@ -71,7 +73,7 @@
           Export
         </button>
 
-        <button
+        <!-- <button
           type="button"
           class="export btn"
           data-bs="modal"
@@ -84,7 +86,7 @@
             style="display: none"
           /><i class="fa fa-arrow-circle-down" aria-hidden="true"></i>
           Import
-        </button>
+        </button> -->
 
         <!-- <button
           type="button"
@@ -101,9 +103,9 @@
 </nav>
 <div class="modal-body">
   <div class="container-fluid">
-    <form class="custom-margin-left">
+    <form #detailsForm="ngForm" class="custom-margin-left">
       <div class="mb-3">
-        <td><label for="identify" class="form-label">ID:</label></td>
+        <td><label for="identify" class="form-label">Student Id:</label></td>
         <td class="idbox ml-4">
           <input
             type="number"
@@ -111,7 +113,7 @@
             class="form-control ml"
             name="id"
             id="id"
-            [(ngModel)]="rows[0].id"
+            [(ngModel)]="rows.Student_id"
             disabled
             aria-describedby="emailHelp"
           />
@@ -127,9 +129,9 @@
             type="text"
             placeholder="Enter your name"
             class="form-control ml"
-            id="exampleInputEmail1"
+            id="name"
             name="name"
-            [(ngModel)]="rows[0].name"
+            [(ngModel)]="rows.Name"
             disabled
           />
         </td>
@@ -145,9 +147,9 @@
             type="text"
             placeholder="Enter name"
             class="form-control ml"
-            id="exampleInputPassword1"
+            id="father_name"
             name="father_name"
-            [(ngModel)]="rows[0].father_name"
+            [(ngModel)]="rows.Father_Name"
             disabled
           />
         </td>
@@ -160,7 +162,7 @@
             type="date"
             id="datepicker"
             name="datepicker"
-            [(ngModel)]="rows[0].date_of_birth"
+            [(ngModel)]="rows.Date_of_Birth"
             disabled
           />
         </td>
@@ -173,8 +175,8 @@
               class="form-check-input gen"
               type="radio"
               name="inlineRadioOptions"
-              [(ngModel)]="rows[0].gender"
-              id="inlineRadio1"
+              [(ngModel)]="rows.Gender"
+              id="gender"
               [value]="false"
             />
             <label class="form-check-label" for="inlineRadio1">Male</label>
@@ -184,8 +186,8 @@
               class="form-check-input"
               type="radio"
               name="inlineRadioOptions"
-              [(ngModel)]="rows[0].gender"
-              id="inlineRadio2"
+              [(ngModel)]="rows.Gender"
+              id="gender"
               [value]="true"
             />
             <label class="form-check-label" for="inlineRadio2">Female</label>
@@ -198,8 +200,8 @@
           type="checkbox"
           class="form-check-input nrc"
           name="nrc_exists"
-          [(ngModel)]="rows[0].nrc_exists"
-          id="exampleCheck1"
+          [(ngModel)]="rows.Nrc_Exists"
+          id="nrc_exists"
         />
       </div>
 
@@ -213,9 +215,9 @@
             placeholder="Enter your NRC"
             class="form-control ml"
             name="nrc"
-            [(ngModel)]="rows[0].nrc"
+            [(ngModel)]="rows.Nrc"
             disabled
-            id="exampleInputEmail1"
+            id="nrc"
           />
         </td>
       </div>
@@ -235,13 +237,17 @@
         <th class="table3">Result</th>
         <!-- <th class="table1"><i class="fa fa-plus" aria-hidden="true"></i></th> -->
         <th class="table2">
-          <a (click)="plus()" type="button" class="plus">
+          <a (click)="plus()" type="button" class="plus" name="plus">
             <i class="fa fa-plus" aria-hidden="true"></i>
           </a>
         </th>
       </tr>
     </thead>
-    <tbody *ngFor="let row of myRows" id="tbody" class="tbody">
+    <tbody
+      *ngFor="let row of myRows; trackBy: trackByFn"
+      id="tbody"
+      class="tbody"
+    >
       <tr>
         <td class="mt-1">
           <div class="input-group-sm">
@@ -257,7 +263,7 @@
             </select>
           </div>
         </td>
-        <!-- <td class="mt-1">
+        <td class="mt-1">
           <div class="input-group-sm" for="myanmar">
             <input
               type="number"
@@ -266,34 +272,19 @@
               name="myanmar"
               #myanmar="ngModel"
               [(ngModel)]="row.Myanmar"
+              max="100"
+              [ngModelOptions]="{ standalone: true }"
+              [ngClass]="{ 'is-invalid': myanmar.touched && myanmar.errors }"
+              required
               aria-describedby="emailHelp"
             />
           </div>
-          <span class="span" *ngIf="myanmar.touched && myanmar.errors"
-            >Myanmar value must be 100.</span
-          >
-        </td> -->
-        <td class="mt-1">
-          <div class="input-group-sm" for="myanmarInput">
-            <input
-              type="number"
-              class="form-control"
-              id="myanmar"
-              name="myanmar"
-              [(ngModel)]="row.Myanmar"
-              aria-describedby="emailHelp"
-              #myanmarInput="ngModel"
-              [ngClass]="{
-                'is-invalid': myanmarInput.invalid && myanmarInput.touched
-              }"
-            />
-          </div>
-          <div
-            *ngIf="myanmarInput.invalid && myanmarInput.touched"
+          <span
+            class="span"
+            *ngIf="myanmar.touched && myanmar.errors"
             class="invalid-feedback"
+            >Myanmar value must be 100 or less.</span
           >
-            Myanmar value must be 100 or below.
-          </div>
         </td>
 
         <td class="mt-1">
@@ -365,20 +356,20 @@
               name="total"
               [(ngModel)]="row.Total"
               aria-describedby="emailHelp"
+              disabled
             />
           </div>
         </td>
         <td class="mt-1">
           <div class="input-group-sm">
-            <select
-              class="form-select"
-              id="inputGroupSelect02"
+            <input
+              type="text"
+              class="form-control"
+              name="result"
+              id="result"
               [(ngModel)]="row.Result"
-            >
-              <option *ngFor="let exam of exams" [value]="exam">
-                {{ row.Result }}
-              </option>
-            </select>
+              disabled
+            />
           </div>
         </td>
 
@@ -395,14 +386,19 @@
       </tr>
     </tbody>
 
-    <tbody *ngFor="let data of datas" id="tbody" class="tbody">
+    <tbody
+      *ngFor="let data of datas; trackBy: trackByFn; let i = index"
+      id="datas"
+      class="datas"
+    >
       <tr>
         <td class="mt-1">
           <div class="input-group-sm">
             <select
               class="form-select"
-              id="inputGroupSelect02"
-              [(ngModel)]="SchoolYear"
+              id="schoolyear"
+              name="schoolyear"
+              [(ngModel)]="data.SchoolYear"
             >
               <option *ngFor="let item of items" [value]="item">
                 {{ item }}
@@ -418,7 +414,7 @@
               class="form-control"
               id="myanmar"
               name="myanmar"
-              [(ngModel)]="Myanmar"
+              [(ngModel)]="data.Myanmar"
               aria-describedby="emailHelp"
             />
           </div>
@@ -430,7 +426,7 @@
               class="form-control"
               id="english"
               name="english"
-              [(ngModel)]="English"
+              [(ngModel)]="data.English"
               aria-describedby="emailHelp"
             />
           </div>
@@ -442,7 +438,7 @@
               class="form-control"
               id="mathematics"
               name="mathematics"
-              [(ngModel)]="Mathematics"
+              [(ngModel)]="data.Mathematics"
               aria-describedby="emailHelp"
             />
           </div>
@@ -454,7 +450,7 @@
               class="form-control"
               id="chemistry"
               name="chemistry"
-              [(ngModel)]="Chemistry"
+              [(ngModel)]="data.Chemistry"
               aria-describedby="emailHelp"
             />
           </div>
@@ -466,7 +462,7 @@
               class="form-control"
               id="physics"
               name="physics"
-              [(ngModel)]="Physics"
+              [(ngModel)]="data.Physics"
               aria-describedby="emailHelp"
             />
           </div>
@@ -478,7 +474,7 @@
               class="form-control"
               id="bio_eco"
               name="bio_eco"
-              [(ngModel)]="Bio_Eco"
+              [(ngModel)]="data.Bio_Eco"
               aria-describedby="emailHelp"
             />
           </div>
@@ -490,22 +486,29 @@
               class="form-control"
               id="total"
               name="total"
-              [(ngModel)]="totalMarks"
+              [(ngModel)]="data.totalMarks"
               aria-describedby="emailHelp"
+              disabled
             />
           </div>
         </td>
         <td class="mt-1">
           <div class="input-group-sm">
-            <select
-              class="form-select"
-              id="inputGroupSelect02"
-              [(ngModel)]="result"
-            >
-              <option *ngFor="let exam of exams" [value]="exam">
+            <input
+              type="text"
+              class="form-control"
+              name="result"
+              id="result"
+              [(ngModel)]="data.result"
+              disabled
+            />
+            <!-- <option *ngFor="let exam of exams" [value]="exam">
                 {{ exam }}
-              </option>
-            </select>
+              </option> -->
+
+            <!-- <div *ngFor="let exam of exams" class="exam">
+              {{ exam }}
+            </div> -->
           </div>
         </td>
         <!-- <td class="modal" tabindex="-1" id="delete">

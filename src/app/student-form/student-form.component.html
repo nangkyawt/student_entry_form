@@ -59,12 +59,10 @@
         </li>
 
         <li class="nav-item">
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-          >
+          <!-- <button type="button" class="btn btn-primary" (click)="addStudent()">
+            Add Student
+          </button> -->
+          <button type="button" class="btn btn-primary" (click)="addStudent()">
             Add Student
           </button>
         </li>
@@ -74,7 +72,7 @@
 </nav>
 
 <!-- Modal -->
-<div
+<!-- <div
   class="modal fade"
   id="exampleModal"
   tabindex="-1"
@@ -182,7 +180,7 @@
                   required
                 />
               </td>
-              <!-- <p>Selected Date: {{ selectedDate }}</p> -->
+            
               <div *ngIf="valiAge()" class="text-danger">
                 Student must be 18years or above.
               </div>
@@ -276,11 +274,11 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 <table class="table table-striped table-hover">
   <thead>
     <tr>
-      <th class="table1">Id</th>
+      <th class="table1">Student Id</th>
       <th class="table1">Name</th>
       <th class="table1">Father Name</th>
       <th class="table1">Date of Birth</th>
@@ -297,15 +295,16 @@
           | search : searchText
           | paginate : { itemsPerPage: pageSize, currentPage: currentPage }
       "
-      [routerLink]="shouldnavigate ? ['/student', result.id] : null"
+      (click)="getStudentArrayId(result)"
+      [routerLink]="shouldnavigate ? ['/details'] : null"
     >
-      <td class="text">{{ result.id }}</td>
-      <td>{{ result.name }}</td>
-      <td>{{ result.father_name }}</td>
-      <td>{{ result.date_of_birth | date : "yyyy-MM-dd" : "UTC" }}</td>
-      <td>{{ result.gender | gender }}</td>
-      <td>{{ result.nrc_exists }}</td>
-      <td>{{ result.nrc }}</td>
+      <td class="text">{{ result.Student_id }}</td>
+      <td>{{ result.Name }}</td>
+      <td>{{ result.Father_Name }}</td>
+      <td>{{ result.Date_of_Birth | date : "yyyy-MM-dd" : "UTC" }}</td>
+      <td>{{ result.Gender | gender }}</td>
+      <td>{{ result.Nrc_Exists }}</td>
+      <td>{{ result.Nrc }}</td>
       <button
         type="button"
         data-bs-toggle="modal"
@@ -323,7 +322,7 @@
         data-bs-target="#delete"
         aria-hidden="true"
         data-bs-toggle="modal"
-        (click)="getId(result.id)"
+        (click)="getId(result.Student_id)"
       >
         <i class="fa fa-trash" aria-hidden="true"></i>
       </button>
@@ -358,7 +357,9 @@
         <div class="container-fluid">
           <form>
             <div class="mb-3">
-              <td><label for="identify" class="form-label">ID:</label></td>
+              <td>
+                <label for="identify" class="form-label">Student ID:</label>
+              </td>
               <td class="idbox">
                 <input
                   type="number"
@@ -367,7 +368,7 @@
                   id="id"
                   name="id"
                   #identify="ngModel"
-                  [(ngModel)]="array.id"
+                  [(ngModel)]="array.Student_id"
                   disabled
                   aria-describedby="emailHelp"
                 />
@@ -384,7 +385,7 @@
                   class="form-control"
                   id="exampleInputEmail1"
                   name="name"
-                  [(ngModel)]="array.name"
+                  [(ngModel)]="array.Name"
                   aria-describedby="emailHelp"
                 />
               </td>
@@ -402,7 +403,7 @@
                   class="form-control"
                   id="exampleInputPassword1"
                   name="father_name"
-                  [(ngModel)]="array.father_name"
+                  [(ngModel)]="array.Father_Name"
                   required
                 />
               </td>
@@ -415,7 +416,7 @@
                   type="date"
                   id="datepicker"
                   name="datepicker"
-                  [(ngModel)]="array.date_of_birth"
+                  [(ngModel)]="array.Date_of_Birth"
                 />
               </td>
             </div>
@@ -429,7 +430,7 @@
                     name="inlineRadioOptions"
                     id="inlineRadio1"
                     (change)="gendermale()"
-                    [(ngModel)]="array.gender"
+                    [(ngModel)]="array.Gender"
                     [value]="false"
                   />
                   <label class="form-check-label" for="inlineRadio1"
@@ -443,7 +444,7 @@
                     name="inlineRadioOptions"
                     id="inlineRadio2"
                     (change)="genderfemale()"
-                    [(ngModel)]="array.gender"
+                    [(ngModel)]="array.Gender"
                     [value]="true"
                   />
                   <label class="form-check-label" for="inlineRadio2"
@@ -461,7 +462,7 @@
                 class="form-check-input"
                 name="nrc_exists"
                 id="exampleCheck1"
-                [(ngModel)]="array.nrc_exists"
+                [(ngModel)]="array.Nrc_Exists"
                 (change)="clearNrc()"
               />
             </div>
@@ -477,8 +478,8 @@
                   class="form-control"
                   name="nrc"
                   id="exampleInputEmail1"
-                  [(ngModel)]="array.nrc"
-                  [disabled]="!array.nrc_exists"
+                  [(ngModel)]="array.Nrc"
+                  [disabled]="!array.Nrc_Exists"
                   (change)="clearNrc()"
                 />
               </td>
