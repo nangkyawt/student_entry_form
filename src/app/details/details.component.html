@@ -4,6 +4,12 @@
 <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert">
   Import Failed!
 </div>
+<div *ngIf="showGenderErrorMessage" class="alert alert-danger" role="alert">
+  Import Failed!
+</div>
+<div *ngIf="showMarkErrorMessage" class="alert alert-danger" role="alert">
+  Import Failed!
+</div>
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Mark Template</a>
@@ -26,13 +32,15 @@
             New
           </button>
         </li>
+        <!-- /(click)="saveData(detailsForm)" -->
+        <!--   (click)="createBulk()" -->
         <li class="nav-item">
           <button
             type="button"
             class="btn"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
-            (click)="saveData(detailsForm)"
+            (click)="createBulk()"
           >
             <i class="fa fa-floppy-o" aria-hidden="true"></i>
             Save
@@ -73,7 +81,7 @@
           Export
         </button>
 
-        <!-- <button
+        <button
           type="button"
           class="export btn"
           data-bs="modal"
@@ -86,7 +94,7 @@
             style="display: none"
           /><i class="fa fa-arrow-circle-down" aria-hidden="true"></i>
           Import
-        </button> -->
+        </button>
 
         <!-- <button
           type="button"
@@ -105,7 +113,7 @@
   <div class="container-fluid">
     <form #detailsForm="ngForm" class="custom-margin-left">
       <div class="mb-3">
-        <td><label for="identify" class="form-label">Student Id:</label></td>
+        <td><label for="id" class="form-label">Student Id:</label></td>
         <td class="idbox ml-4">
           <input
             type="number"
@@ -132,7 +140,6 @@
             id="name"
             name="name"
             [(ngModel)]="rows.Name"
-            disabled
           />
         </td>
       </div>
@@ -150,7 +157,6 @@
             id="father_name"
             name="father_name"
             [(ngModel)]="rows.Father_Name"
-            disabled
           />
         </td>
       </div>
@@ -163,7 +169,6 @@
             id="datepicker"
             name="datepicker"
             [(ngModel)]="rows.Date_of_Birth"
-            disabled
           />
         </td>
       </div>
@@ -215,303 +220,428 @@
             placeholder="Enter your NRC"
             class="form-control ml"
             name="nrc"
-            [(ngModel)]="rows.Nrc"
-            disabled
             id="nrc"
+            [(ngModel)]="rows.Nrc"
           />
         </td>
       </div>
     </form>
-  </div>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th class="table1">School Year</th>
-        <th class="table2">Myanmar</th>
-        <th class="table2">English</th>
-        <th class="table2">Mathematics</th>
-        <th class="table2">Chemistry</th>
-        <th class="table2">Physics</th>
-        <th class="table2">Bio/Eco</th>
-        <th class="table2">Total</th>
-        <th class="table3">Result</th>
-        <!-- <th class="table1"><i class="fa fa-plus" aria-hidden="true"></i></th> -->
-        <th class="table2">
-          <a (click)="plus()" type="button" class="plus" name="plus">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-          </a>
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      *ngFor="let row of myRows; trackBy: trackByFn"
-      id="tbody"
-      class="tbody"
-    >
-      <tr>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <select
-              class="form-select"
-              name="select"
-              id="inputGroupSelect02"
-              [(ngModel)]="row.SchoolYear"
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="table1">School Year</th>
+          <th class="table2">Myanmar</th>
+          <th class="table2">English</th>
+          <th class="table2">Mathematics</th>
+          <th class="table2">Chemistry</th>
+          <th class="table2">Physics</th>
+          <th class="table2">Bio/Eco</th>
+          <th class="table2">Total</th>
+          <th class="table3">Result</th>
+          <!-- <th class="table1"><i class="fa fa-plus" aria-hidden="true"></i></th> -->
+          <th class="table2">
+            <a (click)="plus()" type="button" class="plus" name="plus">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </a>
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        *ngFor="let row of myRows; trackBy: trackByFn"
+        id="tbody"
+        class="tbody"
+      >
+        <tr>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <select
+                class="form-select"
+                name="select"
+                id="inputGroupSelect02"
+                [(ngModel)]="row.SchoolYear"
+              >
+                <option *ngFor="let item of items" [value]="row.SchoolYear">
+                  {{ row.SchoolYear }}
+                </option>
+              </select>
+            </div>
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm" for="myanmar">
+              <input
+                type="number"
+                class="form-control"
+                id="myanmar"
+                name="myanmar"
+                #myanmar="ngModel"
+                [(ngModel)]="row.Myanmar"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{ 'is-invalid': myanmar.touched && myanmar.errors }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="myanmar.touched && myanmar.errors"
+              class="invalid-feedback"
+              >Myanmar value must be 100 or less.</span
             >
-              <option *ngFor="let item of items" [value]="row.SchoolYear">
-                {{ row.SchoolYear }}
-              </option>
-            </select>
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm" for="myanmar">
-            <input
-              type="number"
-              class="form-control"
-              id="myanmar"
-              name="myanmar"
-              #myanmar="ngModel"
-              [(ngModel)]="row.Myanmar"
-              max="100"
-              [ngModelOptions]="{ standalone: true }"
-              [ngClass]="{ 'is-invalid': myanmar.touched && myanmar.errors }"
-              required
-              aria-describedby="emailHelp"
-            />
-          </div>
-          <span
-            class="span"
-            *ngIf="myanmar.touched && myanmar.errors"
-            class="invalid-feedback"
-            >Myanmar value must be 100 or less.</span
-          >
-        </td>
+          </td>
 
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="english"
-              name="english"
-              [(ngModel)]="row.English"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="mathematics"
-              name="mathematics"
-              [(ngModel)]="row.Mathematics"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="chemistry"
-              name="chemistry"
-              [(ngModel)]="row.Chemistry"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="physics"
-              name="physics"
-              [(ngModel)]="row.Physics"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="bio_eco"
-              name="bio_eco"
-              [(ngModel)]="row.Bio_Eco"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="total"
-              name="total"
-              [(ngModel)]="row.Total"
-              aria-describedby="emailHelp"
-              disabled
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="text"
-              class="form-control"
-              name="result"
-              id="result"
-              [(ngModel)]="row.Result"
-              disabled
-            />
-          </div>
-        </td>
-
-        <td>
-          <button
-            type="button"
-            class="delete-button delete"
-            value="delete"
-            (click)="deleteMark(row.id)"
-          >
-            <i class="fa fa-trash" aria-hidden="true"></i>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-
-    <tbody
-      *ngFor="let data of datas; trackBy: trackByFn; let i = index"
-      id="datas"
-      class="datas"
-    >
-      <tr>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <select
-              class="form-select"
-              id="schoolyear"
-              name="schoolyear"
-              [(ngModel)]="data.SchoolYear"
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="english"
+                name="english"
+                [(ngModel)]="row.English"
+                #english="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{ 'is-invalid': english.touched && english.errors }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="english.touched && english.errors"
+              class="invalid-feedback"
+              >English value must be 100 or less.</span
             >
-              <option *ngFor="let item of items" [value]="item">
-                {{ item }}
-              </option>
-            </select>
-          </div>
-        </td>
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="mathematics"
+                name="mathematics"
+                [(ngModel)]="row.Mathematics"
+                #mathematics="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': mathematics.touched && mathematics.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="mathematics.touched && mathematics.errors"
+              class="invalid-feedback"
+              >Mathematics value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="chemistry"
+                name="chemistry"
+                [(ngModel)]="row.Chemistry"
+                #chemistry="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': chemistry.touched && chemistry.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="chemistry.touched && chemistry.errors"
+              class="invalid-feedback"
+              >Chemistry value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="physics"
+                name="physics"
+                [(ngModel)]="row.Physics"
+                #physics="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': physics.touched && physics.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="physics.touched && physics.errors"
+              class="invalid-feedback"
+              >Physics value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="bio_eco"
+                name="bio_eco"
+                [(ngModel)]="row.Bio_Eco"
+                #bio_eco="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': bio_eco.touched && bio_eco.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="bio_eco.touched && bio_eco.errors"
+              class="invalid-feedback"
+              >Bio_Eco value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="total"
+                name="total"
+                [(ngModel)]="row.Total"
+                aria-describedby="emailHelp"
+                disabled
+              />
+            </div>
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="text"
+                class="form-control"
+                name="result"
+                id="result"
+                [(ngModel)]="row.Result"
+                disabled
+              />
+            </div>
+          </td>
 
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="myanmar"
-              name="myanmar"
-              [(ngModel)]="data.Myanmar"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="english"
-              name="english"
-              [(ngModel)]="data.English"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="mathematics"
-              name="mathematics"
-              [(ngModel)]="data.Mathematics"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="chemistry"
-              name="chemistry"
-              [(ngModel)]="data.Chemistry"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="physics"
-              name="physics"
-              [(ngModel)]="data.Physics"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="bio_eco"
-              name="bio_eco"
-              [(ngModel)]="data.Bio_Eco"
-              aria-describedby="emailHelp"
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="number"
-              class="form-control"
-              id="total"
-              name="total"
-              [(ngModel)]="data.totalMarks"
-              aria-describedby="emailHelp"
-              disabled
-            />
-          </div>
-        </td>
-        <td class="mt-1">
-          <div class="input-group-sm">
-            <input
-              type="text"
-              class="form-control"
-              name="result"
-              id="result"
-              [(ngModel)]="data.result"
-              disabled
-            />
-            <!-- <option *ngFor="let exam of exams" [value]="exam">
-                {{ exam }}
-              </option> -->
+          <td>
+            <button
+              type="button"
+              class="delete-button delete"
+              value="delete"
+              (click)="deleteMark(row.id)"
+            >
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
 
-            <!-- <div *ngFor="let exam of exams" class="exam">
-              {{ exam }}
-            </div> -->
-          </div>
-        </td>
-        <!-- <td class="modal" tabindex="-1" id="delete">
+      <tbody *ngFor="let data of datas; let i = index" id="datas" class="datas">
+        <tr>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <select
+                class="form-select"
+                id="schoolyear"
+                name="schoolyear"
+                [(ngModel)]="data.SchoolYear"
+              >
+                <option *ngFor="let item of items" [value]="item">
+                  {{ item }}
+                </option>
+              </select>
+            </div>
+          </td>
+
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="myanmar"
+                name="myanmar"
+                [(ngModel)]="data.Myanmar"
+                max="100"
+                #myanmar="ngModel"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{ 'is-invalid': myanmar.touched && myanmar.errors }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="myanmar.touched && myanmar.errors"
+              class="invalid-feedback"
+              >Myanmar value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="english"
+                name="english"
+                [(ngModel)]="data.English"
+                #english="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{ 'is-invalid': english.touched && english.errors }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="english.touched && english.errors"
+              class="invalid-feedback"
+              >English value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="mathematics"
+                name="mathematics"
+                [(ngModel)]="data.Mathematics"
+                #mathematics="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': mathematics.touched && mathematics.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="mathematics.touched && mathematics.errors"
+              class="invalid-feedback"
+              >Mathematics value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="chemistry"
+                name="chemistry"
+                [(ngModel)]="data.Chemistry"
+                #chemistry="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': chemistry.touched && chemistry.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="chemistry.touched && chemistry.errors"
+              class="invalid-feedback"
+              >Chemistry value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="physics"
+                name="physics"
+                [(ngModel)]="data.Physics"
+                #physics="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': physics.touched && physics.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="physics.touched && physics.errors"
+              class="invalid-feedback"
+              >Physics value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="bio_eco"
+                name="bio_eco"
+                [(ngModel)]="data.Bio_Eco"
+                #bio_eco="ngModel"
+                max="100"
+                [ngModelOptions]="{ standalone: true }"
+                [ngClass]="{
+                  'is-invalid': bio_eco.touched && bio_eco.errors
+                }"
+                required
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <span
+              class="span"
+              *ngIf="bio_eco.touched && bio_eco.errors"
+              class="invalid-feedback"
+              >Bio_Eco value must be 100 or less.</span
+            >
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="number"
+                class="form-control"
+                id="total"
+                name="total"
+                [(ngModel)]="data.totalMarks"
+                aria-describedby="emailHelp"
+                disabled
+              />
+            </div>
+          </td>
+          <td class="mt-1">
+            <div class="input-group-sm">
+              <input
+                type="text"
+                class="form-control"
+                name="result"
+                id="result"
+                [(ngModel)]="data.Result"
+                disabled
+              />
+            </div>
+          </td>
+          <!-- <td class="modal" tabindex="-1" id="delete">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -548,17 +678,18 @@
             </div>
           </div>
         </td> -->
-        <td>
-          <button
-            type="button"
-            class="delete-button"
-            value="delete"
-            (click)="deleteRow()"
-          >
-            <i class="fa fa-trash" aria-hidden="true"></i>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          <td>
+            <button
+              type="button"
+              class="delete-button"
+              value="delete"
+              (click)="deleteRow(i)"
+            >
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

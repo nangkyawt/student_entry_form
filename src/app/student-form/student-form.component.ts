@@ -18,7 +18,7 @@ export class StudentFormComponent implements OnInit {
     private service: ApiService,
     private route: Router
   ) {}
-  pageSize: any = 10;
+  pageSize: any = 5;
   currentPage = 1;
   searchText: any;
   data: any;
@@ -32,6 +32,7 @@ export class StudentFormComponent implements OnInit {
   showNRCExistsErrorMessage = false;
   showIdErrorMessage = false;
   showNameErrorMessage = false;
+  isFormDisabled: boolean = true;
   students = {
     Student_id: 0,
     Name: '',
@@ -362,6 +363,8 @@ export class StudentFormComponent implements OnInit {
   addStudent() {
     this.service.setStudentId(null);
     this.route.navigate(['/details']);
+
+    this.isFormDisabled = true;
   }
 
   onSubmit() {

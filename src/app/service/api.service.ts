@@ -49,7 +49,13 @@ export class ApiService {
   }
   bulkcreate(data: any) {
     return this.http.post(
-      `http://localhost:3000/api/v1/examresults//bulkCreate`,
+      `http://localhost:3000/api/v1/examresults/bulkCreate`,
+      data
+    );
+  }
+  createBoth(data: any) {
+    return this.http.post(
+      `http://localhost:3000/api/v1/examresults/createStudentAndResults`,
       data
     );
   }
