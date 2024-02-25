@@ -4,11 +4,14 @@
 <div *ngIf="showErrorMessage" class="alert alert-danger" role="alert">
   Import Failed!
 </div>
-<div *ngIf="showGenderErrorMessage" class="alert alert-danger" role="alert">
+<div *ngIf="showNameErrorMessage" class="alert alert-danger" role="alert">
   Import Failed!
 </div>
 <div *ngIf="showMarkErrorMessage" class="alert alert-danger" role="alert">
   Import Failed!
+</div>
+<div *ngIf="showDeleteMessage" class="alert alert-danger" role="alert">
+  Delete Successfully!
 </div>
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
@@ -40,24 +43,23 @@
             class="btn"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
-            (click)="createBulk()"
+            (click)="saveData(detailsForm)"
           >
             <i class="fa fa-floppy-o" aria-hidden="true"></i>
             Save
           </button>
         </li>
-        <li class="nav-item">
-          <button
-            type="button"
-            class="btn"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-            (click)="deleteAllById()"
-          >
-            <i class="fa fa-trash" aria-hidden="true"></i>
-            Delete
-          </button>
-        </li>
+        <button
+          type="button"
+          class="btn"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+          (click)="deleteAllById()"
+        >
+          <i class="fa fa-trash" aria-hidden="true"></i>
+          Delete
+        </button>
+
         <li class="nav-item">
           <button
             type="button"
@@ -74,7 +76,8 @@
           type="button"
           class="export btn"
           data-bs="modal"
-          (click)="exportToExcel(myRows, 'DetailMark')"
+          (click)="exportToExcel([rows], 'DetailMark')"
+          [disabled]="!this.rows.Student_id"
         >
           <i class="fa fa-share-square" aria-hidden="true"></i>
 
@@ -92,19 +95,9 @@
             (change)="importFromExcel($event)"
             #fileInput
             style="display: none"
-          /><i class="fa fa-arrow-circle-down" aria-hidden="true"></i>
+          /><i class="fa fa-arrow-down" aria-hidden="true"></i>
           Import
         </button>
-
-        <!-- <button
-          type="button"
-          class="export btn"
-          data-bs="modal"
-          (click)="exportToExcel(myRows, 'DetailMark')"
-        >
-          <i class="fa fa-arrow-circle-down" aria-hidden="true"></i>
-          Import
-        </button> -->
       </ul>
     </div>
   </div>
@@ -113,7 +106,7 @@
   <div class="container-fluid">
     <form #detailsForm="ngForm" class="custom-margin-left">
       <div class="mb-3">
-        <td><label for="id" class="form-label">Student Id:</label></td>
+        <td><label for="id" class="form-label">Student's ID:</label></td>
         <td class="idbox ml-4">
           <input
             type="number"
@@ -121,16 +114,20 @@
             class="form-control ml"
             name="id"
             id="id"
+            #identify="ngModel"
             [(ngModel)]="rows.Student_id"
-            disabled
+            [disabled]="Student_id"
             aria-describedby="emailHelp"
+            required
           />
         </td>
       </div>
 
       <div class="mb-3">
         <td>
-          <label for="exampleInputEmail1" class="form-label">Name:</label>
+          <label for="exampleInputEmail1" class="form-label"
+            >Student's Name:</label
+          >
         </td>
         <td class="namebox">
           <input
@@ -140,13 +137,14 @@
             id="name"
             name="name"
             [(ngModel)]="rows.Name"
+            #name="ngModel"
           />
         </td>
       </div>
       <div class="mb-3">
         <td>
           <label for="exampleInputPassword1" class="form-label"
-            >Father Name:</label
+            >Father's Name:</label
           >
         </td>
         <td class="farbox">
@@ -156,6 +154,7 @@
             class="form-control ml"
             id="father_name"
             name="father_name"
+            #father_name="ngModel"
             [(ngModel)]="rows.Father_Name"
           />
         </td>
@@ -171,7 +170,11 @@
             [(ngModel)]="rows.Date_of_Birth"
           />
         </td>
+        <div *ngIf="valiAge()" class="text-danger">
+          Student must be 18years or above.
+        </div>
       </div>
+
       <div class="mb-3">
         <td>
           <label for="gender">Gender:</label>
@@ -222,6 +225,7 @@
             name="nrc"
             id="nrc"
             [(ngModel)]="rows.Nrc"
+            [disabled]="!rows.Nrc_Exists"
           />
         </td>
       </div>
@@ -270,12 +274,13 @@
           <td class="mt-1">
             <div class="input-group-sm" for="myanmar">
               <input
-                type="number"
+                type="text"
                 class="form-control"
                 id="myanmar"
                 name="myanmar"
                 #myanmar="ngModel"
                 [(ngModel)]="row.Myanmar"
+                min="0"
                 max="100"
                 [ngModelOptions]="{ standalone: true }"
                 [ngClass]="{ 'is-invalid': myanmar.touched && myanmar.errors }"
@@ -478,6 +483,7 @@
                 id="myanmar"
                 name="myanmar"
                 [(ngModel)]="data.Myanmar"
+                (ngModelChange)="updateCaculation()"
                 max="100"
                 #myanmar="ngModel"
                 [ngModelOptions]="{ standalone: true }"
@@ -501,6 +507,7 @@
                 id="english"
                 name="english"
                 [(ngModel)]="data.English"
+                (ngModelChange)="updateCaculation()"
                 #english="ngModel"
                 max="100"
                 [ngModelOptions]="{ standalone: true }"
@@ -524,6 +531,7 @@
                 id="mathematics"
                 name="mathematics"
                 [(ngModel)]="data.Mathematics"
+                (ngModelChange)="updateCaculation()"
                 #mathematics="ngModel"
                 max="100"
                 [ngModelOptions]="{ standalone: true }"
@@ -549,6 +557,7 @@
                 id="chemistry"
                 name="chemistry"
                 [(ngModel)]="data.Chemistry"
+                (ngModelChange)="updateCaculation()"
                 #chemistry="ngModel"
                 max="100"
                 [ngModelOptions]="{ standalone: true }"
@@ -574,6 +583,7 @@
                 id="physics"
                 name="physics"
                 [(ngModel)]="data.Physics"
+                (ngModelChange)="updateCaculation()"
                 #physics="ngModel"
                 max="100"
                 [ngModelOptions]="{ standalone: true }"
@@ -599,6 +609,7 @@
                 id="bio_eco"
                 name="bio_eco"
                 [(ngModel)]="data.Bio_Eco"
+                (ngModelChange)="updateCaculation()"
                 #bio_eco="ngModel"
                 max="100"
                 [ngModelOptions]="{ standalone: true }"
@@ -624,6 +635,7 @@
                 id="total"
                 name="total"
                 [(ngModel)]="data.totalMarks"
+                (ngModelChange)="updateCaculation()"
                 aria-describedby="emailHelp"
                 disabled
               />
@@ -636,48 +648,13 @@
                 class="form-control"
                 name="result"
                 id="result"
-                [(ngModel)]="data.Result"
+                [(ngModel)]="data.result"
+                (ngModelChange)="updateCaculation()"
                 disabled
               />
             </div>
           </td>
-          <!-- <td class="modal" tabindex="-1" id="delete">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Delete</h5>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  ata-bs-target="#exampleModal1"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div class="modal-body">
-                <p>Are you sure want to delete?</p>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  value="delete"
-                  class="btn btn danger"
-                  data-bs-dismiss="modal"
-                  (click)="deleteRow()"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </td> -->
+
           <td>
             <button
               type="button"

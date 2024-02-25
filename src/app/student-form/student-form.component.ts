@@ -18,7 +18,7 @@ export class StudentFormComponent implements OnInit {
     private service: ApiService,
     private route: Router
   ) {}
-  pageSize: any = 5;
+  pageSize: any = 10;
   currentPage = 1;
   searchText: any;
   data: any;
@@ -53,6 +53,7 @@ export class StudentFormComponent implements OnInit {
   genderfemale() {
     this.students.Gender = true;
   }
+
   // Export to Excel
   exportToExcel(data: any[], fileName: string): void {
     // Exclude unwanted columns (e.g., CreatedAt and UpdatedAt)
@@ -60,7 +61,7 @@ export class StudentFormComponent implements OnInit {
     const modifiedData = data.map((item) => {
       const newItem = { ...item };
       if (newItem.Gender !== undefined) {
-        newItem.Gender == newItem.Gender ? 'Male' : 'Female';
+        newItem.Gender == newItem.Gender ? 'Female' : 'Male';
       }
       excludedColumns.forEach((column) => delete newItem[column]);
       return newItem;
@@ -92,29 +93,8 @@ export class StudentFormComponent implements OnInit {
         });
 
         for (const row of importedData) {
-          const idSet = new Set();
-
-          // Check if gender property exists and is not null
-          // if (isNaN(row.id) || idSet.has(row.id)) {
-          //         return false;
-          //       } else {
-          //         console.error(
-          //           'Invalid or duplicate id . Must be a unique number or order ID cannot be null'
-          //         );
-          //         this.showIdErrorMessage = true;
-          //         setTimeout(() => {
-          //           this.showIdErrorMessage = false;
-          //         }, 3000);
-          //       }idSet.add(row.id);
-
+          // const idSet = new Set();
           if (typeof row.gender !== 'boolean' || row.gender == null) {
-            // Convert the gender value to a string (if it's not already)
-            // const genderString = String(row.gender).trim().toLowerCase();
-            // console.log(genderString);
-            // if (genderString === 'male' || genderString === 'female') {
-            //   row.gender = genderString === 'female';
-            // } else {
-            // Show error message for invalid gender
             console.error(
               'Invalid gender in Excel data. Gender must be "male" or "female".'
             );
@@ -123,7 +103,7 @@ export class StudentFormComponent implements OnInit {
               this.showGenderErrorMessage = false;
             }, 3000);
             event.target.value = null;
-            return; // Exit function if gender is invalid
+            return;
           }
           if (typeof row.name !== 'string' || row.name == null) {
             console.error('Ivalid name.');
@@ -167,53 +147,6 @@ export class StudentFormComponent implements OnInit {
     }
   }
 
-  // ID Validation
-  // validateExcelData(importedData: any[]): boolean {
-  //   const idSet = new Set();
-  //   // const nameSet = new Set();
-  //   for (const row of importedData) {
-  //     // Check if id is a number and is unique
-  //     if (isNaN(row.id) || typeof row.id !== 'number' || idSet.has(row.id)) {
-  //       return false;
-  //     } else {
-  //       console.error(
-  //         'Invalid or duplicate id . Must be a unique number or order ID cannot be null'
-  //       );
-  //       this.showIdErrorMessage = true;
-  //       setTimeout(() => {
-  //         this.showIdErrorMessage = false;
-  //       }, 3000);
-  //     }
-  //     idSet.add(row.id);
-  //     // nameSet.add(row.name.trim().toLowerCase());
-  //   }
-  //   return true;
-  // }
-
-  // Name Validation
-  // validateExcelName(importedData: any[]): string[] {
-  //   const idSet = new Set();
-  //   const errors: string[] = [];
-  //   const nameSet = new Set();
-
-  //   for (const row of importedData) {
-  //     // Check if id is a number and is unique
-  //     if (isNaN(row.id) || typeof row.id !== 'number' || idSet.has(row.id)) {
-  //       errors.push(`Invalid ID for row with name '${row.name}'`);
-  //     }
-  //     // Check if name is a non-empty string and is unique
-  //     if (
-  //       typeof row.name !== 'string' ||
-  //       row.name.trim() === '' ||
-  //       nameSet.has(row.name.trim().toLowerCase())
-  //     ) {
-  //       errors.push(`Invalid name for row with ID '${row.id}'`);
-  //     }
-  //     idSet.add(row.id);
-  //     nameSet.add(row.name.trim().toLowerCase());
-  //   }
-  //   return errors;
-  // }
   // Add
   async savestudent(form: any) {
     console.log(this.students);
@@ -253,6 +186,24 @@ export class StudentFormComponent implements OnInit {
     await this.service.getstudents().subscribe({
       next: (result: any) => {
         console.log('ADD SUCCESSFULLY!', result);
+
+        this.results = result.data;
+        // descending order
+        // console.log(this.results);
+        this.results.sort((a: any, b: any) => a.Student_id - b.Student_id);
+      },
+      error: (error: any) => {
+        console.log('FAIL', error);
+      },
+    });
+  }
+
+  //FindOne
+  async getOneStudent() {
+    console.log('>>>>>>ERROR>>>>');
+    await this.service.findOne(this.students.Student_id).subscribe({
+      next: (result: any) => {
+        console.log('Find Successfully', result);
 
         this.results = result.data;
         // descending order
@@ -319,6 +270,7 @@ export class StudentFormComponent implements OnInit {
   }
 
   getId(id: any) {
+    this.shouldnavigate = false;
     return (this.students.Student_id = id);
   }
 
@@ -363,8 +315,6 @@ export class StudentFormComponent implements OnInit {
   addStudent() {
     this.service.setStudentId(null);
     this.route.navigate(['/details']);
-
-    this.isFormDisabled = true;
   }
 
   onSubmit() {

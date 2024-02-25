@@ -5,7 +5,7 @@ import { DetailsComponent } from './details/details.component';
 
 const routes: Routes = [
   {
-    path: ' ',
+    path: '',
     redirectTo: 'student',
     pathMatch: 'full',
   },

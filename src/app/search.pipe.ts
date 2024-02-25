@@ -11,15 +11,18 @@ export class SearchPipe implements PipeTransform {
     searchText = searchText.toLowerCase();
     return result.filter(
       (students: any) =>
-        (students.name && students.name.toLowerCase().includes(searchText)) ||
-        (students.id && students.id.toString().includes(searchText)) ||
-        (students.father_name &&
-          students.father_name.toLowerCase().includes(searchText)) ||
-        (students.gender === 'String' &&
-          students.gender.toLowerCase().includes(searchText)) ||
-        (students.nrc && students.nrc.toLowerCase().includes(searchText)) ||
-        (students.date_of_birth === 'Date' &&
-          students.date_of_birth.toLowerCase().includes(searchText))
+        (students.Name && students.Name.toLowerCase().includes(searchText)) ||
+        (students.Student_id &&
+          students.Student_id.toString().includes(searchText)) ||
+        (students.Father_Name &&
+          students.Father_Name.toLowerCase().includes(searchText)) ||
+        (students.Gender === 'String' &&
+          students.Gender.toLowerCase().includes(searchText)) ||
+        (students.Nrc && students.Nrc.toLowerCase().includes(searchText)) ||
+        (students.Date_of_Birth === 'Date' &&
+          students.Date_of_Birth.toLowerCase().includes(searchText)) ||
+        (students.Nrc_Exists === 'String' &&
+          students.Nrc_Exists.toLowerCase().includes(searchText))
     );
   }
 }

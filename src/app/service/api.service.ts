@@ -32,6 +32,9 @@ export class ApiService {
   findall() {
     return this.http.get(`http://localhost:3000/api/v1/examresults`);
   }
+  findOne(id: any) {
+    return this.http.get(`http://localhost:3000/api/v1/students/${id}`);
+  }
   getMarks(id: any) {
     return this.http.get(`http://localhost:3000/api/v1/examresults/${id}`);
   }
@@ -41,11 +44,15 @@ export class ApiService {
       data
     );
   }
-  deleteMarks(id: any) {
-    return this.http.delete(`http://localhost:3000/api/v1/examresults/${id}`);
+  deleteMark(id: any) {
+    return this.http.delete(
+      `http://localhost:3000/api/v1/examresults/deleteone/${id}`
+    );
   }
   deleteAllByStudentId(id: any) {
-    return this.http.delete(`http://localhost:3000/api/v1/examresults/${id}`);
+    return this.http.delete(
+      `http://localhost:3000/api/v1/examresults/delete/${id}`
+    );
   }
   bulkcreate(data: any) {
     return this.http.post(
@@ -56,6 +63,17 @@ export class ApiService {
   createBoth(data: any) {
     return this.http.post(
       `http://localhost:3000/api/v1/examresults/createStudentAndResults`,
+      data
+    );
+  }
+  deleteMarksById(id: any) {
+    return this.http.delete(
+      `http://localhost:3000/api/v1/examresults/mark/${id}`
+    );
+  }
+  excelImport(data: any) {
+    return this.http.post(
+      `http://localhost:3000/api/v1/examresults/excelImport`,
       data
     );
   }

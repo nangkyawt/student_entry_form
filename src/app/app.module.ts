@@ -9,6 +9,7 @@ import { GenderPipe } from './gender.pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { SearchPipe } from './search.pipe';
 import { DetailsComponent } from './details/details.component';
+// import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { DetailsComponent } from './details/details.component';
     FormsModule,
     HttpClientModule,
     NgxPaginationModule,
+    // BsDropdownModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],
