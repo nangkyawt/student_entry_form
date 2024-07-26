@@ -9,6 +9,7 @@ import { GenderPipe } from './gender.pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { SearchPipe } from './search.pipe';
 import { DetailsComponent } from './details/details.component';
+import { NrcExistsPipe } from './nrc-exists.pipe';
 // import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 @NgModule({
@@ -18,6 +19,7 @@ import { DetailsComponent } from './details/details.component';
     GenderPipe,
     SearchPipe,
     DetailsComponent,
+    NrcExistsPipe,
   ],
   imports: [
     BrowserModule,

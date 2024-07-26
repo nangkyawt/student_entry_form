@@ -279,9 +279,11 @@ export class StudentFormComponent implements OnInit {
     this.array = data;
     this.shouldnavigate = false;
   }
+
   nonavigate() {
     this.shouldnavigate = true;
   }
+
   //route
   getStudentArrayId(result: any) {
     this.service.setStudentId(result.Student_id);

@@ -77,9 +77,9 @@ export class DetailsComponent implements OnInit {
     console.log('datas:', this.datas);
   }
 
-  trackByFn(index: number, item: FormDataModel): number {
-    return item.id;
-  }
+  // trackByFn(index: number, item: FormDataModel): number {
+  //   return item.id;
+  // }
 
   plus() {
     const newFormData: FormDataModel = new FormDataModel();
@@ -241,9 +241,13 @@ export class DetailsComponent implements OnInit {
         errorMessages.push('Gender is required.');
       }
 
-      if (this.rows.Nrc_Exists && !this.rows.Nrc) {
-        errorMessages.push('NRC is required.');
-      }
+      // if (this.rows.Nrc_Exists) {
+      //   errorMessages.push('NRC is required.');
+      // }
+
+      // if (this.rows.Nrc_Exists && !this.rows.Nrc) {
+      //   errorMessages.push('NRC is required.');
+      // }
 
       // if (!this.datas || this.datas.length === 0) {
       //   errorMessages.push('At least one exam result is required.');
@@ -406,6 +410,81 @@ export class DetailsComponent implements OnInit {
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<CRUD>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   // Export
+  // exportToExcel(rows: any, fileName: string): void {
+  //   // Define the columns you want to include in the export
+  //   const includedColumns = [
+  //     'Student_id',
+  //     'Name',
+  //     'Father_Name',
+  //     'Date_of_Birth',
+  //     'Nrc_Exists',
+  //     'Nrc',
+  //     'Gender',
+  //     'SchoolYear',
+  //     'Myanmar',
+  //     'English',
+  //     'Mathematics',
+  //     'Chemistry',
+  //     'Physics',
+  //     'Bio_Eco',
+  //     'Total',
+  //     'Result',
+  //   ];
+
+  //   // Initialize an array to hold the final data
+  //   const finalData: any[] = [];
+
+  //   // Loop through each property (student) of the rows object
+  //   for (const studentId in rows) {
+  //     if (rows.hasOwnProperty(studentId)) {
+  //       const student = rows[studentId];
+  //       // Check if student data has exam results
+  //       if (student.exam_results && student.exam_results.length > 0) {
+  //         console.log(student.exam_results, 'examResults');
+  //         // Loop through each exam result of the student
+  //         student.exam_results.forEach((result: any) => {
+  //           // Create a new row for each examresult
+  //           const newRow: any = {};
+
+  //           // Copy student information to the new row
+  //           includedColumns.forEach((column) => {
+  //             newRow[column] = student[column];
+  //             newRow['Gender'] = student['Gender'] ? 'Female' : 'Male';
+  //             newRow['Result'] = student['Result'] ? 'Passed' : 'Failed';
+  //           });
+
+  //           // Copy exam result information to the new row
+  //           includedColumns.slice(7, 16).forEach((column) => {
+  //             // newRow[column] =
+  //             //   result[column.substring(column.indexOf('_') + 1)];
+  //             newRow[column] = result[column];
+  //           });
+
+  //           // Add the new row to the final data
+  //           finalData.push(newRow);
+  //           console.log(finalData);
+  //           console.log(newRow);
+  //         });
+  //       } else {
+  //         // If student has no exam results, create a row with only student information
+  //         const newRow: any = {};
+  //         includedColumns.forEach((column) => {
+  //           newRow[column] = student[column];
+  //         });
+  //         finalData.push(newRow);
+  //       }
+  //     }
+  //   }
+
+  //   // Convert modified data to Excel worksheet
+  //   const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(finalData);
+  //   const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+  //   // Save the workbook to an Excel file
+  //   XLSX.writeFile(wb, `${fileName}.xlsx`);
+  // }
+
   exportToExcel(rows: any, fileName: string): void {
     // Define the columns you want to include in the export
     const includedColumns = [
@@ -436,30 +515,31 @@ export class DetailsComponent implements OnInit {
         const student = rows[studentId];
         // Check if student data has exam results
         if (student.exam_results && student.exam_results.length > 0) {
-          console.log(student.exam_results, 'examResults');
           // Loop through each exam result of the student
+
           student.exam_results.forEach((result: any) => {
-            // Create a new row for each examresult
+            // Create a new row for each exam result
             const newRow: any = {};
 
             // Copy student information to the new row
             includedColumns.forEach((column) => {
               newRow[column] = student[column];
-              newRow['Gender'] = student['Gender'] ? 'Male' : 'Female';
-              newRow['Result'] = student['Result'] ? 'Passed' : 'Failed';
             });
+
+            newRow['Gender'] = student['Gender'] ? 'Female' : 'Male';
+
+            // Assign the Result directly to newRow
+            const passed = result['Result'] === true; // Check if Result is true
+            console.log('Result:', result['Result']);
+            newRow['Result'] = passed ? 'Passed' : 'Failed';
 
             // Copy exam result information to the new row
             includedColumns.slice(7, 16).forEach((column) => {
-              // newRow[column] =
-              //   result[column.substring(column.indexOf('_') + 1)];
               newRow[column] = result[column];
             });
 
             // Add the new row to the final data
             finalData.push(newRow);
-            console.log(finalData);
-            console.log(newRow);
           });
         } else {
           // If student has no exam results, create a row with only student information
@@ -474,6 +554,11 @@ export class DetailsComponent implements OnInit {
 
     // Convert modified data to Excel worksheet
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(finalData);
+    ws['!cols'] = [
+      { wch: 20 },
+      ...Array(includedColumns.length - 1).fill({ wch: 10 }),
+    ];
+
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
@@ -482,72 +567,6 @@ export class DetailsComponent implements OnInit {
   }
 
   // Import from Excel
-  // importFromExcel(event: any): void {
-  //   const file: File = event.target.files[0];
-  //   const reader: FileReader = new FileReader();
-
-  //   if (file) {
-  //     reader.onload = (e: any) => {
-  //       try {
-  //         const arrayBuffer: ArrayBuffer = e.target.result;
-  //         const workbook: XLSX.WorkBook = XLSX.read(arrayBuffer, {
-  //           type: 'array',
-  //         });
-  //         const sheetName: string = workbook.SheetNames[0];
-  //         const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
-  //         const importedData: any[] = XLSX.utils.sheet_to_json(worksheet, {
-  //           raw: true,
-  //         });
-
-  //         const transformedData = importedData.map((studentData: any) => {
-  //           console.log(studentData, 'Here is studentData');
-  //           const transformedStudent = {
-  //             Student_id: studentData.Student_id,
-  //             Name: studentData.Name,
-  //             Father_Name: studentData.Father_Name,
-  //             Date_of_Birth: studentData.Date_of_Birth,
-  //             Gender: studentData.Gender === 'Female' ? true : false,
-  //             Nrc_Exists: studentData.Nrc_Exists,
-  //             Nrc: studentData.Nrc,
-  //             examResults: [
-  //               {
-  //                 SchoolYear: studentData.SchoolYear,
-  //                 Myanmar: studentData.Myanmar,
-  //                 English: studentData.English,
-  //                 Mathematics: studentData.Mathematics,
-  //                 Physics: studentData.Physics,
-  //                 Chemistry: studentData.Chemistry,
-  //                 Bio_Eco: studentData.Bio_Eco,
-  //                 Total: studentData.totalMarks,
-  //               },
-  //             ],
-  //           };
-  //           console.log(transformedStudent);
-  //           return transformedStudent;
-  //         });
-
-  //         // Call service to save the transformed data
-  //         this.service.excelImport(transformedData).subscribe({
-  //           next: (result: any) => {
-  //             console.log('Excel data saved successfully', result);
-  //             alert('Excel data imported successfully.');
-  //           },
-  //           error: (error: any) => {
-  //             console.log('Error saving Excel data', error);
-  //             alert('Error importing Excel data. Please try again.');
-  //           },
-  //         });
-  //       } catch (error) {
-  //         console.error('Error importing Excel data:', error);
-  //         alert(
-  //           'Error importing Excel data. Please ensure the file format is correct and try again.'
-  //         );
-  //       }
-  //     };
-  //     reader.readAsArrayBuffer(file);
-  //   }
-  // }
-
   importFromExcel(event: any): void {
     const file: File = event.target.files[0];
     const reader: FileReader = new FileReader();
@@ -568,42 +587,114 @@ export class DetailsComponent implements OnInit {
           console.log(importedData, 'Here is my importedData');
           for (const data of importedData) {
             // const idSet = new Set();
-            if (typeof data.name !== 'string' || data.name == null) {
-              console.error('Ivalid name.');
-              this.showNameErrorMessage = true;
-              setTimeout(() => {
-                this.showNameErrorMessage = false;
-              }, 3000);
+            console.log(data, 'Here is data');
+            if (
+              typeof data.Student_id !== 'number' ||
+              data.Student_id == null
+            ) {
+              console.error('Invalid ID.');
+              alert('ID must be number!');
               event.target.value = null;
               return;
             }
-            // if (typeof row.name !== 'string' || row.name == null) {
-            //   console.error('Ivalid name.');
-            //   this.showNameErrorMessage = true;
-            //   setTimeout(() => {
-            //     this.showNameErrorMessage = false;
-            //   }, 3000);
-            //   event.target.value = null;
-            //   return;
-            // }
-            // if (typeof row.nrc_exists !== 'boolean' || row.nrc_exists == null) {
-            //   console.error('Invalid NRC.');
-            //   this.showNRCExistsErrorMessage = true;
-            //   setTimeout(() => {
-            //     this.showNRCExistsErrorMessage = false;
-            //   }, 3000);
-            //   event.target.value = null;
-            //   return;
-            // }
+            if (typeof data.Name !== 'string' || data.Name == null) {
+              console.error('Ivalid name.');
+              alert('Invalid Name!');
+              event.target.value = null;
+              return;
+            }
+
+            if (
+              typeof data.Father_Name !== 'string' ||
+              data.Father_Name == null
+            ) {
+              console.error('Ivalid name.');
+              alert('Invalid Father Name!');
+              this.showNameErrorMessage = true;
+              event.target.value = null;
+              return;
+            }
+            if (
+              typeof data.SchoolYear !== 'string' ||
+              ![
+                'First',
+                'Second',
+                'Third',
+                'Fourth',
+                'Qualified',
+                'Final',
+              ].includes(data.SchoolYear)
+            ) {
+              console.error('Invalid schoolyear.');
+              alert('Invalid School Year!');
+              this.showNameErrorMessage = true;
+              event.target.value = null;
+              return;
+            }
+            if (
+              typeof data.Nrc_Exists !== 'boolean' ||
+              data.Nrc_Exists == null
+            ) {
+              console.error('Invalid NRC.');
+              alert('Invalid NRC!');
+              event.target.value = null;
+              return;
+            }
+            if (typeof data.Myanmar !== 'number' || data.Myanmar == null) {
+              console.error('Invalid Myanmar.');
+              alert('Myanmar must be number!');
+              event.target.value = null;
+              return;
+            }
+            if (typeof data.English !== 'number' || data.English == null) {
+              console.error('Invalid English.');
+              alert('English must be number!');
+              event.target.value = null;
+              return;
+            }
+            if (
+              typeof data.Mathematics !== 'number' ||
+              data.Mathematics == null
+            ) {
+              console.error('Invalid Mathematics.');
+              alert('Mathematics must be number!');
+              event.target.value = null;
+              return;
+            }
+            if (typeof data.Chemistry !== 'number' || data.Chemistry == null) {
+              console.error('Invalid Chemistry.');
+              alert('Chemistry must be number!');
+              event.target.value = null;
+              return;
+            }
+            if (typeof data.Physics !== 'number' || data.Physics == null) {
+              console.error('Invalid Physics.');
+              alert('Physics must be number!');
+              event.target.value = null;
+              return;
+            }
+            if (typeof data.Bio_Eco !== 'number' || data.Bio_Eco == null) {
+              console.error('Invalid Bio_Eco.');
+              alert('Bio_Eco must be number!');
+              event.target.value = null;
+              return;
+            }
           }
+
           // Transform data
           const transformedData = importedData.map((studentData: any) => {
             console.log(studentData, 'Here is studentData');
+            // Parse date of birth from Excel serial number
+            const dobSerial = studentData.Date_of_Birth;
+            const dobDateValue = XLSX.SSF.parse_date_code(dobSerial);
+            const dateOfBirth = new Date(
+              Date.UTC(dobDateValue.y, dobDateValue.m - 1, dobDateValue.d)
+            );
             const transformedStudent = {
               Student_id: studentData.Student_id,
               Name: studentData.Name,
               Father_Name: studentData.Father_Name,
-              Date_of_Birth: studentData.Date_of_Birth,
+              Date_of_Birth: dateOfBirth,
               Gender: studentData.Gender === 'Female' ? true : false,
               Nrc_Exists: studentData.Nrc_Exists,
               Nrc: studentData.Nrc,
@@ -630,9 +721,10 @@ export class DetailsComponent implements OnInit {
             return transformedStudent;
           });
 
-          // Call service to delete existing data and save the transformed data
           this.service.deleteMarksById(this.Student_id).subscribe({
             next: () => {
+              console.log(this.Student_id);
+
               console.log('Existing exam results deleted successfully');
               // Call service to save the transformed data
               this.service.excelImport(transformedData).subscribe({
@@ -661,6 +753,119 @@ export class DetailsComponent implements OnInit {
       reader.readAsArrayBuffer(file);
     }
   }
+
+  // importFromExcel(event: any): void {
+  //   const file: File = event.target.files[0];
+  //   const reader: FileReader = new FileReader();
+
+  //   if (file) {
+  //     reader.onload = (e: any) => {
+  //       try {
+  //         const arrayBuffer: ArrayBuffer = e.target.result;
+  //         const workbook: XLSX.WorkBook = XLSX.read(arrayBuffer, {
+  //           type: 'array',
+  //         });
+  //         const sheetName: string = workbook.SheetNames[0];
+  //         const worksheet: XLSX.WorkSheet = workbook.Sheets[sheetName];
+  //         const importedData: any[] = XLSX.utils.sheet_to_json(worksheet, {
+  //           raw: true,
+  //         });
+
+  //         console.log(importedData, 'Here is my importedData');
+  //         for (const data of importedData) {
+  //           // const idSet = new Set();
+  //           console.log(data, 'Here is data');
+  //           if (
+  //             typeof data.Student_id !== 'number' ||
+  //             data.Student_id == null
+  //           ) {
+  //             console.error('Invalid ID.');
+  //             alert('ID must be number!');
+  //             event.target.value = null;
+  //             return;
+  //           }
+  //           // Other validation checks...
+  //         }
+
+  //         // Transform data
+  //         const transformedData = importedData.map((studentData: any) => {
+  //           console.log(studentData, 'Here is studentData');
+  //           // Parse date of birth from Excel serial number
+  //           const dobSerial = studentData.Date_of_Birth;
+  //           const dobDateValue = XLSX.SSF.parse_date_code(dobSerial);
+  //           const dateOfBirth = new Date(
+  //             Date.UTC(dobDateValue.y, dobDateValue.m - 1, dobDateValue.d)
+  //           );
+  //           const transformedStudent = {
+  //             Student_id: studentData.Student_id,
+  //             Name: studentData.Name,
+  //             Father_Name: studentData.Father_Name,
+  //             Date_of_Birth: dateOfBirth,
+  //             Gender: studentData.Gender === 'Female' ? true : false,
+  //             Nrc_Exists: studentData.Nrc_Exists,
+  //             Nrc: studentData.Nrc,
+  //             examResults: [
+  //               {
+  //                 SchoolYear: studentData.SchoolYear,
+  //                 Myanmar: studentData.Myanmar,
+  //                 English: studentData.English,
+  //                 Mathematics: studentData.Mathematics,
+  //                 Physics: studentData.Physics,
+  //                 Chemistry: studentData.Chemistry,
+  //                 Bio_Eco: studentData.Bio_Eco,
+  //                 totalMarks:
+  //                   studentData.Myanmar +
+  //                   studentData.English +
+  //                   studentData.Mathematics +
+  //                   studentData.Physics +
+  //                   studentData.Chemistry +
+  //                   studentData.Bio_Eco,
+  //               },
+  //             ],
+  //           };
+  //           console.log(transformedStudent);
+  //           return transformedStudent;
+  //         });
+
+  //         // Loop through each transformed student data
+  //         transformedData.forEach((transformedStudent) => {
+  //           console.log(transformedStudent, 'Here is transformedStudent');
+  //           // Delete existing exam results by Student_id
+  //           this.service
+  //             .deleteMarksById(transformedStudent.Student_id)
+  //             .subscribe({
+  //               next: () => {
+  //                 console.log(transformedStudent.Student_id);
+  //                 console.log('Existing exam results deleted successfully');
+
+  //                 // Call service to save the transformed data
+  //                 this.service.excelImport(transformedStudent).subscribe({
+  //                   next: (result: any) => {
+  //                     console.log('Excel data saved successfully', result);
+  //                     alert('Excel data imported successfully.');
+  //                   },
+  //                   error: (error: any) => {
+  //                     console.log('Error saving Excel data', error);
+  //                     alert('Error importing Excel data. Please try again.');
+  //                   },
+  //                 });
+  //               },
+  //               error: (error: any) => {
+  //                 console.log('Error deleting existing exam results', error);
+  //                 alert('Error importing Excel data. Please try again.');
+  //               },
+  //             });
+  //         });
+  //       } catch (error) {
+  //         console.error('Error importing Excel data:', error);
+  //         alert(
+  //           'Error importing Excel data. Please ensure the file format is correct and try again.'
+  //         );
+  //       }
+  //     };
+  //     reader.readAsArrayBuffer(file);
+  //   }
+  // }
 
   uploadExcelData(binaryData: string) {
     // Change the API endpoint to your backend server

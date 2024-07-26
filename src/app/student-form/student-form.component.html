@@ -96,7 +96,7 @@
       <td>{{ result.Father_Name }}</td>
       <td>{{ result.Date_of_Birth | date : "yyyy-MM-dd" : "UTC" }}</td>
       <td>{{ result.Gender | gender }}</td>
-      <td>{{ result.Nrc_Exists }}</td>
+      <td>{{ result.Nrc_Exists | nrcExists }}</td>
       <td>{{ result.Nrc }}</td>
       <button
         type="button"
